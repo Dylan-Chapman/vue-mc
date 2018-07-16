@@ -8,7 +8,7 @@ import {Model} from '../../src'
  */
 const FALSY      = ['', false, null, 0, 0.0, NaN, undefined, Infinity];
 const TRUTHY     = ['0', '1', 'abc', true, 1, -1, 1.0, -1.0, [], {}];
-const STRINGS    = ['', '0', '1', 'true', 'false', new String(''), new String('abc')];
+const STRINGS    = ['', '0', '1', 'true', 'false'];
 const NON_STRING = [true, false, null, 0, 1, -1, NaN, undefined, Infinity, {}, []];
 
 /**
