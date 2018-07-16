@@ -377,7 +377,7 @@ class Model extends Base {
 
         // Reset specific attributes.
         if (attribute) {
-            copyFrom(this._reference, this._attributes, _.castArray(attribute));
+            copyFrom(this._reference, this._attributes, [].concat(attribute || []));
 
         // Reset all attributes if one or more specific ones were not given.
         } else {
@@ -413,7 +413,7 @@ class Model extends Base {
 
         // Only mutate specific attributes.
         } else {
-            _.each(_.castArray(attribute), (attribute) => {
+            _.each([].concat(attribute || []), (attribute) => {
                 let current = this.get(attribute);
                 let mutated = this.mutated(attribute, current);
 
@@ -448,7 +448,7 @@ class Model extends Base {
             Vue.set(this, '_reference', active);
 
         } else {
-            _.each(_.castArray(attribute), (attribute) => {
+            _.each([].concat(attribute || []), (attribute) => {
                 Vue.set(this._reference, attribute, _.get(active, attribute));
             });
         }
@@ -548,7 +548,7 @@ class Model extends Base {
         let attributes = _.defaultTo(attribute, _.keys(this._attributes));
 
         // Unset either specific attributes or all attributes if none provided.
-        _.each(_.castArray(attributes), (attribute) => {
+        _.each([].concat(attributes || []), (attribute) => {
             if (this.has(attribute)) {
                 Vue.set(this._attributes, attribute, _.get(defaults, attribute));
             }
@@ -608,7 +608,7 @@ class Model extends Base {
         let errors = [];
 
         if (attribute in rules) {
-            let ruleset = _.castArray(rules[attribute]);
+            let ruleset = [].concat(rules[attribute] || []);
 
             _.each(ruleset, (rule) => {
                 let result = rule(value, attribute, this);
@@ -908,7 +908,7 @@ class Model extends Base {
         if (_.isEmpty(errors)) {
             Vue.delete(this._errors, attribute);
         } else {
-            Vue.set(this._errors, attribute, _.castArray(errors));
+            Vue.set(this._errors, attribute, [].concat(errors || []));
         }
     }
 

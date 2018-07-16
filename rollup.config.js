@@ -24,7 +24,7 @@ const BASE = {
 	]
 }
 
-const MAIN = _.assign({}, BASE, {
+const MAIN = Object.assign({}, BASE, {
 	input: 'src/index.js',
 	output: [
 		{ file: pkg.main,    format: 'cjs' },
@@ -32,14 +32,14 @@ const MAIN = _.assign({}, BASE, {
 	],
 })
 
-const VALIDATION = _.assign({}, BASE, {
+const VALIDATION = Object.assign({}, BASE, {
 	input: 'src/validation/index.js',
 	output: [
 		{ file: 'validation/index.js', format: 'cjs' },
 	],
 })
 
-const LOCALES = _.assign({}, BASE, {
+const LOCALES = Object.assign({}, BASE, {
 	input: './src/Validation/locale.js',
 	output: [
 		{ file: 'validation/locale.js', format: 'cjs' },

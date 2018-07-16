@@ -15,7 +15,7 @@ const NON_STRING = [true, false, null, 0, 1, -1, NaN, undefined, Infinity, {}, [
  * Test a rule against some values, passing the expectation to the callback.
  */
 const test = ($rule, values, model, callback) => {
-    _.each(_.castArray(values), (value) => {
+    _.each([].concat(values || []), (value) => {
         callback(expect($rule(value, '__attribute__', model), `"${value}"`));
     });
 }

@@ -207,7 +207,7 @@ export const rule = function(config) {
 
         // Add the invalid value to the message context, which is made available
         // to all rules by default. This allows for ${value} interpolation.
-        _.assign(data, {attribute, value });
+        Object.assign(data, {attribute, value });
 
         // This would be a custom format explicitly set on this rule.
         let format = _.get($rule, '_format');
@@ -230,7 +230,7 @@ export const rule = function(config) {
      *                     setting a custom format doesn't modify the base rule.
      */
     $rule.copy = () => {
-        return _.assign(rule({name, test, data }), _.pick($rule, [
+        return Object.assign(rule({name, test, data }), _.pick($rule, [
             '_format',
             '_and',
             '_or',
@@ -243,7 +243,7 @@ export const rule = function(config) {
      * @param {string|Function} format
      */
     $rule.format = (format) => {
-        return _.assign($rule.copy(), {_format: format });
+        return Object.assign($rule.copy(), {_format: format });
     };
 
     /**
@@ -253,7 +253,7 @@ export const rule = function(config) {
      * @param {Function|Function[]} rules One or more functions to add to the chain.
      */
     $rule.or = (rules) => {
-        return _.assign($rule.copy(), {_or: _.concat($rule._or, rules) });
+        return Object.assign($rule.copy(), {_or: _.concat($rule._or, rules) });
     };
 
     /**
@@ -263,7 +263,7 @@ export const rule = function(config) {
      * @param {Function|Function[]} rules One or more functions to add to the chain.
      */
     $rule.and = (rules) => {
-        return _.assign($rule.copy(), {_and: _.concat($rule._and, rules) });
+        return Object.assign($rule.copy(), {_and: _.concat($rule._and, rules) });
     }
 
     $rule._and    = [];     // "and" chain
