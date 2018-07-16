@@ -221,9 +221,7 @@ class Collection extends Base {
      * @returns {bool} Whether all models in this collection have valid data.
      */
     validate() {
-        return _.reduce(this.models, (valid, model) => {
-            return model.validate() && valid;
-        }, true);
+        return _.reduce(this.models, (valid, model) => model.validate() && valid, true);
     }
 
     /**
@@ -746,14 +744,14 @@ class Collection extends Base {
      * @returns {Model[]} Models in this collection that are in a "saving" state.
      */
     getSavingModels() {
-        return _.filter(this.models, 'saving');
+        return this.models.filter(model => model.saving);
     }
 
     /**
      * @returns {Model[]} Models in this collection that are in a "deleting" state.
      */
     getDeletingModels() {
-        return _.filter(this.models, 'deleting');
+        return this.models.filter(model => model.deleting);
     }
 
     /**
@@ -1150,9 +1148,7 @@ class Collection extends Base {
         }
 
         // Exclude all models that return `false` on delete.
-        let models = _.filter(this.models, (model) => {
-            return model.onDelete() !== false;
-        });
+        let models = this.models.filter((model) => model.onDelete() !== false);
 
         // Don't save if there are no models to delete.
         if (_.isEmpty(models)) {

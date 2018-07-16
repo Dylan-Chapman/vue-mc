@@ -229,22 +229,18 @@ export const rule = function(config) {
      * @returns {Function} A copy of this rule, so that appending to a chain or
      *                     setting a custom format doesn't modify the base rule.
      */
-    $rule.copy = () => {
-        return Object.assign(rule({name, test, data }), _.pick($rule, [
-            '_format',
-            '_and',
-            '_or',
-        ]));
-    }
+    $rule.copy = () => Object.assign(rule({name, test, data }), _.pick($rule, [
+        '_format',
+        '_and',
+        '_or',
+    ]));
 
     /**
      * Sets a custom error message format on this rule.
      *
      * @param {string|Function} format
      */
-    $rule.format = (format) => {
-        return Object.assign($rule.copy(), {_format: format });
-    };
+    $rule.format = (format) => Object.assign($rule.copy(), {_format: format });
 
     /**
      * Adds another rule or function to this rule's OR chain. If the given rule
@@ -252,9 +248,7 @@ export const rule = function(config) {
      *
      * @param {Function|Function[]} rules One or more functions to add to the chain.
      */
-    $rule.or = (rules) => {
-        return Object.assign($rule.copy(), {_or: $rule._or.concat(rules || [])});
-    };
+    $rule.or = (rules) => Object.assign($rule.copy(), {_or: $rule._or.concat(rules || [])});
 
     /**
      * Adds another rule or function to this rule's AND chain. If the given rule
@@ -262,9 +256,7 @@ export const rule = function(config) {
      *
      * @param {Function|Function[]} rules One or more functions to add to the chain.
      */
-    $rule.and = (rules) => {
-        return Object.assign($rule.copy(), {_and: $rule._and.concat(rules || [])});
-    }
+    $rule.and = (rules) => Object.assign($rule.copy(), {_and: $rule._and.concat(rules || [])});
 
     $rule._and    = [];     // "and" chain
     $rule._or     = [];     // "or" chain
@@ -293,9 +285,7 @@ export const after = function(date) {
  */
 export const alpha = rule({
     name: 'alpha',
-    test: (value) => {
-        return typeof value === "string" && isAlpha(_.deburr(value));
-    },
+    test: (value) => typeof value === "string" && isAlpha(_.deburr(value)),
 })
 
 /**
@@ -303,9 +293,7 @@ export const alpha = rule({
  */
 export const alphanumeric = rule({
     name: 'alphanumeric',
-    test: (value) => {
-        return typeof value === "string" && isAlphanumeric(_.deburr(value));
-    },
+    test: (value) => typeof value === "string" && isAlphanumeric(_.deburr(value)),
 })
 
 /**
@@ -637,10 +625,8 @@ export const number = rule({
  */
 export const numeric = rule({
     name: 'numeric',
-    test: (value) => {
-        return (typeof value === "number" && ! isNaN(value))
-            || (value && typeof value === "string" && ! isNaN(parseFloat(value)));
-    },
+    test: (value) => (typeof value === "number" && ! isNaN(value))
+        || (value && typeof value === "string" && ! isNaN(parseFloat(value))),
 })
 
 /**
@@ -648,11 +634,9 @@ export const numeric = rule({
  */
 export const object = rule({
     name: 'object',
-    test: (value) => {
-        return   _.isObject(value)
-            && ! Array.isArray(value)
-            && typeof value !== "function";
-    },
+    test: (value) =>  _.isObject(value)
+        && ! Array.isArray(value)
+        && typeof value !== "function",
 })
 
 /**

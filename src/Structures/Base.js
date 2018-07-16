@@ -234,9 +234,7 @@ class Base {
             let replacements = this.getRouteReplacements(route, parameters);
 
             // Replace all route parameters with their replacement values.
-            return _.reduce(replacements, (result, value, parameter) => {
-                return _.replace(result, parameter, value);
-            }, route);
+            return _.reduce(replacements, (result, value, parameter) => _.replace(result, parameter, value), route);
         }
     }
 
@@ -497,9 +495,7 @@ class Base {
                 })
 
                 // Failure fallback, for errors that occur in `onFailure`.
-                .catch((error) => {
-                    return reject(error);
-                });
+                .catch((error) => reject(error));
         });
     }
 

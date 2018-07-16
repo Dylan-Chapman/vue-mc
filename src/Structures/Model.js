@@ -666,9 +666,7 @@ class Model extends Base {
             );
         }
 
-        return _.reduce(attributes, (valid, value, attribute) => {
-            return this.validateAttribute(attribute) && valid;
-        }, true);
+        return _.reduce(attributes, (valid, value, attribute) => this.validateAttribute(attribute) && valid, true);
     }
 
     /**
