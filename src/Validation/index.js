@@ -10,7 +10,14 @@ import isJSON           from 'validator/lib/isJSON'
 import isURL            from 'validator/lib/isURL'
 import isUUID           from 'validator/lib/isUUID'
 import * as _           from 'lodash';
-import { format as formatDate, isAfter as isAfterDate, isBefore as isBeforeDate, isValid as isValidDate, parse as parseDate, toDate } from "date-fns";
+import {
+    format              as formatDate,
+    isAfter             as isAfterDate,
+    isBefore            as isBeforeDate,
+    isValid             as isValidDate,
+    parse               as parseDate,
+    toDate,
+}                       from "date-fns";
 
 // We want to set the messages a superglobal so that imports across files
 // reference the same messages object.
