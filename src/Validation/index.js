@@ -196,7 +196,7 @@ export const rule = function(config) {
                 // A rule should either return true in the event of a general
                 // "pass", or nothing at all. A failure would have to be a
                 // string message (usually from another rule) or `false`.
-                if (result === true || _.isUndefined(result)) {
+                if (result === true || typeof result === "undefined") {
                     return true;
                 }
             }
@@ -313,7 +313,7 @@ export const alphanumeric = rule({
  */
 export const array = rule({
     name: 'array',
-    test: _.isArray,
+    test: (value) => Array.isArray(value),
 })
 
 
@@ -412,7 +412,7 @@ export const dateformat = function(format) {
  */
 export const defined = rule({
     name: 'defined',
-    test: (value) => ! _.isUndefined(value),
+    test: (value) => typeof value !== "undefined",
 })
 
 /**
@@ -478,7 +478,9 @@ export const gte = function(min) {
  */
 export const integer = rule({
     name: 'integer',
-    test: _.isInteger,
+    test: (value) => Number.hasOwnProperty("isInteger")
+        ? Number.isInteger(value)
+        : typeof value === "number" && isFinite(value) && Math.floor(value) === value,
 })
 
 /**
@@ -538,7 +540,7 @@ export const json = rule({
 export const length = function(min, max) {
 
     // No maximum means the value must be *at least* the minimum.
-    if (_.isUndefined(max)) {
+    if (typeof max === "undefined") {
         return rule({
             name: 'length',
             data: {min, max},
@@ -609,7 +611,7 @@ export const min = function(min) {
  */
 export const negative = rule({
     name: 'negative',
-    test: (value) => _.toNumber(value) < 0,
+    test: (value) => parseFloat(value) < 0,
 })
 
 /**
@@ -627,7 +629,7 @@ export const not = function(...values) {
  */
 export const number = rule({
     name: 'number',
-    test: (value) => _.isFinite(value),
+    test: (value) => typeof value === "number" && isFinite(value),
 })
 
 /**
@@ -636,8 +638,8 @@ export const number = rule({
 export const numeric = rule({
     name: 'numeric',
     test: (value) => {
-        return (_.isNumber(value) && ! _.isNaN(value))
-            || (value && typeof value === "string" && ! _.isNaN(_.toNumber(value)));
+        return (typeof value === "number" && ! isNaN(value))
+            || (value && typeof value === "string" && ! isNaN(parseFloat(value)));
     },
 })
 
@@ -648,8 +650,8 @@ export const object = rule({
     name: 'object',
     test: (value) => {
         return   _.isObject(value)
-            && ! _.isArray(value)
-            && ! _.isFunction(value);
+            && ! Array.isArray(value)
+            && typeof value !== "function";
     },
 })
 
@@ -658,7 +660,7 @@ export const object = rule({
  */
 export const positive = rule({
     name: 'positive',
-    test: (value) => _.toNumber(value) > 0,
+    test: (value) => parseFloat(value) > 0,
 })
 
 /**
