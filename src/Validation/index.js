@@ -44,14 +44,14 @@ export const messages =
      * @param {string} locale
      */
     locale(locale) {
-        this.$locale = locale.toString().toLowerCase();
+        this.$locale = locale ? locale.toString().toLowerCase() : locale;
     }
 
     /**
      * Registers a language pack.
      */
     register(bundle) {
-        let locale = bundle.locale.toString().toLowerCase();
+        let locale = bundle.locale ? bundle.locale.toString().toLowerCase() : bundle.locale;
 
         _.each(_.get(bundle, 'messages', {}), (message, name) => {
             _.set(this.$locales, [locale, name], _.template(message));
