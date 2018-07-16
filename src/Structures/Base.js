@@ -474,7 +474,7 @@ class Base {
             // Support passing the request configuration as a function, to allow
             // for deferred resolution of certain values that may have changed
             // during the call to "onRequest".
-            if (_.isFunction(config)) {
+            if (typeof config === "function") {
                 config = config();
             }
 

@@ -289,7 +289,7 @@ class Collection extends Base {
     add(model = {}) {
 
         // If given an array, assume an array of models and add them all.
-        if (_.isArray(model)) {
+        if (Array.isArray(model)) {
             return _.filter(_.map(model, this.add));
         }
 
@@ -381,13 +381,13 @@ class Collection extends Base {
 
         // Support using a predicate to remove all models it returns true for.
         // Alternatively support an object of values to filter by.
-        if (_.isFunction(model) || _.isPlainObject(model)) {
+        if (typeof model === "function" || _.isPlainObject(model)) {
             return this.remove(_.filter(this.models, model));
         }
 
         // Support removing multiple models at the same time if an array was
         // given. A model would otherwise always be an object so this is safe.
-        if (_.isArray(model)) {
+        if (Array.isArray(model)) {
             return _.filter(_.map(model, this.remove));
         }
 
@@ -703,7 +703,7 @@ class Collection extends Base {
 
             // There is no sensible alternative to an array here, so anyting else
             // is considered an exception that indicates an unexpected state.
-            if ( ! _.isArray(saved)) {
+            if ( ! Array.isArray(saved)) {
                 throw new ResponseError(
                     'Response data must be an array or empty',
                     response);
@@ -805,7 +805,7 @@ class Collection extends Base {
     setErrors(errors) {
 
         // Support an array of errors, one for each model in the collection.
-        if (_.isArray(errors)) {
+        if (Array.isArray(errors)) {
             this.applyValidationErrorArray(errors);
 
         // Support an object of errors keyed by model identifiers.
@@ -830,7 +830,7 @@ class Collection extends Base {
         let response = error.getResponse();
         let errors = response.getValidationErrors();
 
-        if ( ! _.isPlainObject(errors) && ! _.isArray(errors)) {
+        if ( ! _.isPlainObject(errors) && ! Array.isArray(errors)) {
             throw new ResponseError(
                 'Validation errors must be an object or array', response);
         }
@@ -958,7 +958,7 @@ class Collection extends Base {
 
         // There is no sensible alternative to an array here, so anyting else
         // is considered an exception that indicates an unexpected state.
-        if ( ! _.isArray(models)) {
+        if ( ! Array.isArray(models)) {
             throw new ResponseError('Expected an array of models in fetch response');
         }
 

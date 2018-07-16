@@ -41,7 +41,7 @@ const copyFrom = function(source, target, keys) {
     }
 
     _.each(source, (value, key) => {
-        if (_.isArray(value)) {
+        if (Array.isArray(value)) {
             Vue.set(target, key, []);
             copyFrom(value, target[key]);
 
@@ -49,7 +49,7 @@ const copyFrom = function(source, target, keys) {
             Vue.set(target, key, {});
             copyFrom(value, target[key]);
 
-        } else if (_.isObject(value) && _.isFunction(value.clone)) {
+        } else if (_.isObject(value) && typeof value.clone === "function") {
             Vue.set(target, key, value.clone());
 
         } else {
@@ -283,12 +283,12 @@ class Model extends Base {
      * @param {Collection} collection
      */
     registerCollection(collection) {
-        if (_.isArray(collection)) {
+        if (Array.isArray(collection)) {
             _.each(collection, this.registerCollection);
             return;
         }
 
-        if (_.isNil(collection) || _.isUndefined(collection._uid)) {
+        if (_.isNil(collection) || typeof collection._uid === "undefined") {
             throw new Error('Collection is not valid');
         }
 
@@ -304,12 +304,12 @@ class Model extends Base {
      * @param {Collection} collection
      */
     unregisterCollection(collection) {
-        if (_.isArray(collection)) {
+        if (Array.isArray(collection)) {
             _.each(collection, this.unregisterCollection);
             return;
         }
 
-        if (_.isNil(collection) || _.isUndefined(collection._uid)) {
+        if (_.isNil(collection) || typeof collection._uid === "undefined") {
             throw new Error('Collection is not valid');
         }
 
@@ -406,7 +406,7 @@ class Model extends Base {
      * @param {string|string[]|undefined} attribute
      */
     mutate(attribute) {
-        if (_.isUndefined(attribute)) {
+        if (typeof attribute === "undefined") {
             _.each(this._attributes, (value, attribute) => {
                 Vue.set(this._attributes, attribute, this.mutated(attribute, value));
             });
@@ -444,7 +444,7 @@ class Model extends Base {
         let active = _.cloneDeep(this._attributes);
 
         // Sync either specific attributes or all attributes if none provided.
-        if (_.isUndefined(attribute)) {
+        if (typeof attribute === "undefined") {
             Vue.set(this, '_reference', active);
 
         } else {
@@ -614,7 +614,7 @@ class Model extends Base {
                 let result = rule(value, attribute, this);
 
                 // Rules should return an error message if validation failed.
-                if (_.isString(result)) {
+                if (typeof result === "string") {
                     errors.push(result);
                     valid = false;
 
@@ -630,7 +630,7 @@ class Model extends Base {
         // method. The expectation is that the validate function will return
         // `true` if valid, `false` if not, and handle its own errors.
         if (this.getOption('validateRecursively')) {
-            if (_.isFunction(_.get(value, 'validate'))) {
+            if (typeof _.get(value, 'validate') === "function") {
                 valid = value.validate() && valid;
             }
         }
@@ -649,15 +649,15 @@ class Model extends Base {
      * @returns {boolean} `true` if the model passes validation.
      */
     validate(attributes) {
-        if (_.isString(attributes)) {
+        if (typeof attributes === "string") {
             return this.validateAttribute(attributes);
 
         // Only validate the attributes that were specified.
-        } else if (_.isArray(attributes)) {
+        } else if (Array.isArray(attributes)) {
             attributes = _.pick(this._attributes, attributes);
 
         // Or validate all attributes if none were given.
-        } else if (_.isUndefined(attributes)) {
+        } else if (typeof attributes === "undefined") {
             attributes = this._attributes;
 
         } else {
