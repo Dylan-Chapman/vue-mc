@@ -369,11 +369,11 @@ The equivalent of this rule using a function might be something like this:
 validation() {
     return {
         secret: (value) => {
-            if (_.isNull(value)) {
+            if (value === null) {
                 return;
             }
 
-            if ( ! _.isString(value)) {
+            if ( typeof value !== "string") {
                 return "Must be a string";
             }
 

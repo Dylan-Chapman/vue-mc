@@ -44,14 +44,14 @@ export const messages =
      * @param {string} locale
      */
     locale(locale) {
-        this.$locale = _.toLower(locale);
+        this.$locale = locale.toString().toLowerCase();
     }
 
     /**
      * Registers a language pack.
      */
     register(bundle) {
-        let locale = _.toLower(bundle.locale);
+        let locale = bundle.locale.toString().toLowerCase();
 
         _.each(_.get(bundle, 'messages', {}), (message, name) => {
             _.set(this.$locales, [locale, name], _.template(message));
@@ -65,7 +65,7 @@ export const messages =
      * @param {string} format
      */
     set(name, format, locale) {
-        let template = _.isString(format) ? _.template(format) : format;
+        let template = typeof format === "string" ? _.template(format) : format;
 
         // Use the given locale.
         if (locale) {
@@ -162,7 +162,7 @@ export const rule = function(config) {
 
                 // If any of the chained rules return a string, we know that
                 // that rule has failed, and therefore this chain is invalid.
-                if (_.isString(result)) {
+                if (typeof result === "string") {
                     return result;
                 }
 
@@ -211,7 +211,7 @@ export const rule = function(config) {
         }
 
         // Replace the custom format with a template if it's still a string.
-        if (_.isString(format)) {
+        if (typeof format === "string") {
             $rule._format = format = _.template(format);
         }
 
@@ -287,7 +287,7 @@ export const after = function(date) {
 export const alpha = rule({
     name: 'alpha',
     test: (value) => {
-        return _.isString(value) && isAlpha(_.deburr(value));
+        return typeof value === "string" && isAlpha(_.deburr(value));
     },
 })
 
@@ -297,7 +297,7 @@ export const alpha = rule({
 export const alphanumeric = rule({
     name: 'alphanumeric',
     test: (value) => {
-        return _.isString(value) && isAlphanumeric(_.deburr(value));
+        return typeof value === "string" && isAlphanumeric(_.deburr(value));
     },
 })
 
@@ -315,7 +315,7 @@ export const array = rule({
  */
 export const ascii = rule({
     name: 'ascii',
-    test: (value) => _.isString(value) && /^[\x00-\x7F]+$/.test(value),
+    test: (value) => typeof value === "string" && /^[\x00-\x7F]+$/.test(value),
 })
 
 /**
@@ -323,7 +323,7 @@ export const ascii = rule({
  */
 export const base64 = rule({
     name: 'base64',
-    test: (value) => _.isString(value) && isBase64(value),
+    test: (value) => typeof value === "string" && isBase64(value),
 })
 
 /**
@@ -341,14 +341,14 @@ export const before = function(date) {
  * Checks if a value is between a given minimum or maximum, inclusive by default.
  */
 export const between = function(min, max, inclusive = true) {
-    let _min = +(_.isString(min) ? toDate(min) : min);
-    let _max = +(_.isString(max) ? toDate(max) : max);
+    let _min = +(typeof min === "string" ? toDate(min) : min);
+    let _max = +(typeof max === "string" ? toDate(max) : max);
 
     return rule({
         data: {min, max},
         name: inclusive ? 'between_inclusive' : 'between',
         test: (value) => {
-            let _value = +(_.isString(value) ? toDate(value) : value);
+            let _value = +(typeof value === "string" ? toDate(value) : value);
 
             return inclusive
                 ? _.gte(_value, _min) && _.lte(_value, _max)
@@ -371,7 +371,7 @@ export const boolean = rule({
  */
 export const creditcard = rule({
     name: 'creditcard',
-    test: (value) => _.isString(value) && isCreditCard(value),
+    test: (value) => typeof value === "string" && isCreditCard(value),
 })
 
 /**
@@ -413,7 +413,7 @@ export const defined = rule({
  */
 export const email = rule({
     name: 'email',
-    test: (value) => _.isString(value) && isEmail(value),
+    test: (value) => typeof value === "string" && isEmail(value),
 })
 
 /**
@@ -479,7 +479,7 @@ export const integer = rule({
  */
 export const ip = rule({
     name: 'ip',
-    test: (value) => _.isString(value) && isIP(value),
+    test: (value) => typeof value === "string" && isIP(value),
 })
 
 /**
@@ -511,7 +511,7 @@ export const isnull = rule({
  */
 export const iso8601 = rule({
     name: 'iso8601',
-    test: (value) => _.isString(value) && isISO8601(value),
+    test: (value) => typeof value === "string" && isISO8601(value),
 })
 
 /**
@@ -519,7 +519,7 @@ export const iso8601 = rule({
  */
 export const json = rule({
     name: 'json',
-    test: (value) => _.isString(value) && isJSON(value),
+    test: (value) => typeof value === "string" && isJSON(value),
 })
 
 /**
@@ -630,7 +630,7 @@ export const numeric = rule({
     name: 'numeric',
     test: (value) => {
         return (_.isNumber(value) && ! _.isNaN(value))
-            || (value && _.isString(value) && ! _.isNaN(_.toNumber(value)));
+            || (value && typeof value === "string" && ! _.isNaN(_.toNumber(value)));
     },
 })
 
@@ -678,7 +678,7 @@ export const same = function(other) {
  */
 export const string = rule({
     name: 'string',
-    test: _.isString,
+    test: (value) => typeof value === "string",
 })
 
 /**
@@ -686,7 +686,7 @@ export const string = rule({
  */
 export const url = rule({
     name: 'url',
-    test: (value) => _.isString(value) && isURL(value),
+    test: (value) => typeof value === "string" && isURL(value),
 })
 
 /**
@@ -694,5 +694,5 @@ export const url = rule({
  */
 export const uuid = rule({
     name: 'uuid',
-    test: (value) => _.isString(value) && isUUID(value),
+    test: (value) => typeof value === "string" && isUUID(value),
 })
