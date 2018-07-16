@@ -1,0 +1,6 @@
+{
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.autoIndent": false,
+    "editor.formatOnSave": false,
+    "eslint.autoFixOnSave": false
+}
