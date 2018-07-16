@@ -668,7 +668,7 @@ class Collection extends Base {
         // An empty, non-array response indicates that we didn't intend to send
         // any models in the response. This means that the current models are
         // already up to date, as no changes are necessary.
-        if (_.isNil(models) || models === '') {
+        if (models == null || models === '') {
             return null;
         }
 
@@ -696,7 +696,7 @@ class Collection extends Base {
 
         // Empty response is similar to an empty response returned when saving
         // a model: assume that the attributes are the saved state, so sync.
-        if (_.isNil(saved)) {
+        if (saved == null) {
             _.each(saving, _.method('sync'));
 
         } else {
@@ -893,7 +893,7 @@ class Collection extends Base {
     page(page) {
 
         // Disable pagination if a valid page wasn't provided.
-        if (_.isNil(page)) {
+        if (page == null) {
             Vue.set(this, '_page', NO_PAGE);
 
         // Page was provided, so we should either set the page or disable

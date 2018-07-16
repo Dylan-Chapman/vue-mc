@@ -495,7 +495,7 @@ export const isblank = rule({
  */
 export const isnil = rule({
     name: 'isnil',
-    test: _.isNil,
+    test: (value) => value == null,
 })
 
 /**
@@ -503,7 +503,7 @@ export const isnil = rule({
  */
 export const isnull = rule({
     name: 'isnull',
-    test: _.isNull,
+    test: (value) => value === null,
 })
 
 /**
@@ -659,7 +659,7 @@ export const positive = rule({
  */
 export const required = rule({
     name: 'required',
-    test: (value) => ! (_.isNil(value) || value === ''),
+    test: (value) => ! (value == null || value === ''),
 })
 
 /**

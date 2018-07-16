@@ -288,7 +288,7 @@ class Model extends Base {
             return;
         }
 
-        if (_.isNil(collection) || typeof collection._uid === "undefined") {
+        if (collection == null || typeof collection._uid === "undefined") {
             throw new Error('Collection is not valid');
         }
 
@@ -309,7 +309,7 @@ class Model extends Base {
             return;
         }
 
-        if (_.isNil(collection) || typeof collection._uid === "undefined") {
+        if (collection == null || typeof collection._uid === "undefined") {
             throw new Error('Collection is not valid');
         }
 
@@ -1067,7 +1067,7 @@ class Model extends Base {
      *                    model's identifier is missing.
      */
     isNew() {
-        return _.isNil(this.identifier());
+        return this.identifier() == null;
     }
 
     /**
