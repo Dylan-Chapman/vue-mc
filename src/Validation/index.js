@@ -369,7 +369,7 @@ export const between = function(min, max, inclusive = true) {
  */
 export const boolean = rule({
     name: 'boolean',
-    test: _.isBoolean,
+    test: (value) => typeof value === "boolean",
 })
 
 
