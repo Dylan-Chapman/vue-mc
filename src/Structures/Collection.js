@@ -1125,7 +1125,7 @@ class Collection extends Base {
         let identifier  = this.getDeleteQueryIdenitifierKey();
         let identifiers = this.getIdentifiers(models);
 
-        return {[identifier]: _.join(identifiers, ',') };
+        return {[identifier]: identifiers.join(',') };
     }
 
     /**
