@@ -76,7 +76,7 @@ describe('Rules', () => {
         })
 
         it('should fail for invalid alpha tokens', () => {
-            fail($.alpha, _.concat(FALSY, ['abc!', '?', '_']));
+            fail($.alpha, FALSY.concat(['abc!', '?', '_']));
         })
     })
 
@@ -86,7 +86,7 @@ describe('Rules', () => {
         })
 
         it('should fail for invalid alphanumeric tokens', () => {
-            fail($.alphanumeric, _.concat(FALSY, ['abc!', '?', '_']));
+            fail($.alphanumeric, FALSY.concat(['abc!', '?', '_']));
         })
     })
 
@@ -96,7 +96,7 @@ describe('Rules', () => {
         })
 
         it('should fail for non-array values', () => {
-            fail($.array, _.concat(FALSY, [{}]));
+            fail($.array, FALSY.concat([{}]));
         })
     })
 

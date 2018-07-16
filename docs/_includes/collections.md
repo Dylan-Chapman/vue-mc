@@ -530,7 +530,7 @@ The callback will be passed three arguments: `result`, `model`, and `index`.
 {% highlight js %}
 
 // Returns a flat array of every word of every task's name.
-tasks.reduce((result, task) => _.concat(result, _.words(task.name)), []);
+tasks.reduce((result, task) => result.concat(_.words(task.name)), []);
 
 {% endhighlight %}
 

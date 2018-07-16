@@ -253,7 +253,7 @@ export const rule = function(config) {
      * @param {Function|Function[]} rules One or more functions to add to the chain.
      */
     $rule.or = (rules) => {
-        return Object.assign($rule.copy(), {_or: _.concat($rule._or, rules) });
+        return Object.assign($rule.copy(), {_or: $rule._or.concat(rules || [])});
     };
 
     /**
@@ -263,7 +263,7 @@ export const rule = function(config) {
      * @param {Function|Function[]} rules One or more functions to add to the chain.
      */
     $rule.and = (rules) => {
-        return Object.assign($rule.copy(), {_and: _.concat($rule._and, rules) });
+        return Object.assign($rule.copy(), {_and: $rule._and.concat(rules || [])});
     }
 
     $rule._and    = [];     // "and" chain
