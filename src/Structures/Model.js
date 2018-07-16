@@ -666,7 +666,6 @@ class Model extends Base {
             );
         }
 
-        // Validate all attributes if none were given.
         return _.reduce(attributes, (valid, value, attribute) => {
             return this.validateAttribute(attribute) && valid;
         }, true);
