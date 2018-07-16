@@ -456,7 +456,15 @@ class Collection extends Base {
      * Wraps a new collection instance around some given models.
      */
     wrap(models) {
-        return new (this.constructor)(models);
+        const newCollection = new (this.constructor)(models);
+
+        // Apple the state from the current collection to the new collection
+        Vue.set(newCollection, 'loading',  this.loading);
+        Vue.set(newCollection, 'saving',   this.saving);
+        Vue.set(newCollection, 'deleting', this.deleting);
+        Vue.set(newCollection, 'fatal',    this.fatal);
+
+        return newCollection;
     }
 
     /**
