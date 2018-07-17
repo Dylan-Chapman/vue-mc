@@ -28,22 +28,6 @@ class Collection extends Base {
         return this.size();
     }
 
-    get loading() {
-        return this._state.loading;
-    }
-
-    get saving() {
-        return this._state.saving;
-    }
-
-    get deleting() {
-        return this._state.deleting;
-    }
-
-    get fatal() {
-        return this._state.fatal;
-    }
-
     /**
      * Creates a new instance, called when using 'new'.
      *
@@ -158,18 +142,6 @@ class Collection extends Base {
      */
     clearErrors() {
         _.each(this.models, _.method('clearErrors'));
-    }
-
-    /**
-     * Resets model state, ie. `loading`, etc back to their initial states.
-     */
-    clearState() {
-        Vue.set(this, '_state', {
-            loading: false,
-            saving: false,
-            deleting: false,
-            fatal: false,
-        });
     }
 
     /**
@@ -306,7 +278,7 @@ class Collection extends Base {
 
         // If given an array, assume an array of models and add them all.
         if (Array.isArray(model)) {
-            return _.filter(_.map(model, this.add));
+            return model.map(this.add);
         }
 
         // Objects should be converted to model instances first, then added.
@@ -719,7 +691,6 @@ class Collection extends Base {
         // a model: assume that the attributes are the saved state, so sync.
         if (saved == null) {
             _.each(saving, _.method('sync'));
-
         } else {
 
             // There is no sensible alternative to an array here, so anyting else

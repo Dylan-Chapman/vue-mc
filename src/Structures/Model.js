@@ -82,22 +82,6 @@ class Model extends Base {
         return this._attributes;
     }
 
-    get loading() {
-        return this._state.loading;
-    }
-
-    get saving() {
-        return this._state.saving;
-    }
-
-    get deleting() {
-        return this._state.deleting;
-    }
-
-    get fatal() {
-        return this._state.fatal;
-    }
-
     /**
      * @returns {Object} The collection that this model is registered to.
      */
@@ -353,18 +337,6 @@ class Model extends Base {
         this.clearAttributes();
         this.clearErrors();
         this.clearState();
-    }
-
-    /**
-     * Resets model state, ie. `loading`, etc back to their initial states.
-     */
-    clearState() {
-        Vue.set(this, '_state', {
-            loading: false,
-            saving: false,
-            deleting: false,
-            fatal: false,
-        });
     }
 
     /**

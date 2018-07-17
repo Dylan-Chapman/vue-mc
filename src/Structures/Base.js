@@ -7,6 +7,21 @@ import { autobind } from '../utils.js'
  * Base class for all things common between Model and Collection.
  */
 class Base {
+    get loading() {
+        return this._state.loading;
+    }
+
+    get saving() {
+        return this._state.saving;
+    }
+
+    get deleting() {
+        return this._state.deleting;
+    }
+
+    get fatal() {
+        return this._state.fatal;
+    }
 
     constructor(options) {
         autobind(this);
@@ -14,17 +29,29 @@ class Base {
         // Define an automatic unique ID. This is primarily to distinguish
         // between multiple instances of the same name and data.
         Object.defineProperty(this, '_uid', {
-            value:        _.uniqueId(),
-            enumerable:   false,
+            value: _.uniqueId(),
+            enumerable: false,
             configurable: false,
-            writable:     false,
+            writable: false,
         });
 
         Vue.set(this, '_listeners', {});  // Event listeners
-        Vue.set(this, '_options',   {});  // Internal option store
+        Vue.set(this, '_options', {});  // Internal option store
 
         this.setOptions(options);
         this.boot();
+    }
+
+    /**
+     * Resets model or collection state, ie. `loading`, etc back to their initial states.
+     */
+    clearState() {
+        Vue.set(this, '_state', {
+            loading: false,
+            saving: false,
+            deleting: false,
+            fatal: false,
+        });
     }
 
     /**
@@ -184,9 +211,9 @@ class Base {
     setOptions(...options) {
         Vue.set(this, '_options', _.defaultsDeep(
             {},
-            ...options,                 // Given options
-            this.options(),             // Instance defaults
-            this.getDefaultOptions()    // Class defaults
+            ...options, // Given options
+            this.options(), // Instance defaults
+            this.getDefaultOptions() // Class defaults
         ));
     }
 
@@ -320,11 +347,11 @@ class Base {
      */
     getDefaultMethods() {
         return {
-            fetch:  'GET',
-            save:   'POST',
+            fetch: 'GET',
+            save: 'POST',
             update: 'POST',
             create: 'POST',
-            patch:  'PATCH',
+            patch: 'PATCH',
             delete: 'DELETE',
         }
     }
@@ -388,7 +415,7 @@ class Base {
             return false;
         }
 
-        let status  = error.getResponse().getStatus();
+        let status = error.getResponse().getStatus();
         let invalid = this.getValidationErrorStatus();
 
         return status == invalid;
@@ -509,9 +536,9 @@ class Base {
      */
     fetch(options = {}) {
         let config = () => _.defaults(options, {
-            url:     this.getFetchURL(),
-            method:  this.getFetchMethod(),
-            params:  this.getFetchQuery(),
+            url: this.getFetchURL(),
+            method: this.getFetchMethod(),
+            params: this.getFetchQuery(),
             headers: this.getFetchHeaders(),
         });
 
@@ -529,10 +556,10 @@ class Base {
      */
     save() {
         let config = () => ({
-            url:     this.getSaveURL(),
-            method:  this.getSaveMethod(),
-            data:    this.getSaveData(),
-            params:  this.getSaveQuery(),
+            url: this.getSaveURL(),
+            method: this.getSaveMethod(),
+            data: this.getSaveData(),
+            params: this.getSaveQuery(),
             headers: this.getSaveHeaders(),
         });
 
@@ -550,10 +577,10 @@ class Base {
      */
     delete() {
         let config = () => ({
-            url:     this.getDeleteURL(),
-            method:  this.getDeleteMethod(),
-            data:    this.getDeleteBody(),
-            params:  this.getDeleteQuery(),
+            url: this.getDeleteURL(),
+            method: this.getDeleteMethod(),
+            data: this.getDeleteBody(),
+            params: this.getDeleteQuery(),
             headers: this.getDeleteHeaders(),
         });
 
