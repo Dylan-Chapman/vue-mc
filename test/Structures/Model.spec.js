@@ -1520,7 +1520,9 @@ describe('Model', () => {
                 routes() { return {fetch: '/collection/fetch/{id}'}}
             }
 
-            m.loading = true;
+            m._state.loading = true;
+            expect(m.loading).to.equal(true);
+
             expectRequestToBeSkipped(m.fetch(), done);
         })
 
@@ -1938,7 +1940,7 @@ describe('Model', () => {
                 routes() { return {save: '/collection/save'}}
             }
 
-            m.saving = true;
+            m._state.saving = true;
             expect(m.saving).to.equal(true);
 
             m.on('save', () => {
@@ -2566,7 +2568,9 @@ describe('Model', () => {
                 throw 'Did not expect to handle event'
             });
 
-            m.deleting = true;
+            m._state.deleting = true;
+            expect(m.deleting).to.equal(true);
+
             expectRequestToBeSkipped(m.delete(), done);
         })
 

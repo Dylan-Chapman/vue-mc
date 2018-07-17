@@ -1571,7 +1571,7 @@ describe('Collection', () => {
             c.add(new Model({id: 1}));
             c.add(new Model({id: 2}));
 
-            c.deleting = true;
+            c._state.deleting = true;
             expect(c.deleting).to.equal(true);
 
             c.on('delete', () => {
@@ -1604,9 +1604,9 @@ describe('Collection', () => {
             let m2 = c.add({a: 2});
             let m3 = c.add({a: 3});
 
-            m1.deleting = true;
-            m2.deleting = true;
-            m3.deleting = true;
+            m1._state.deleting = true;
+            m2._state.deleting = true;
+            m3._state.deleting = true;
 
             c.delete().then((response) => {
                 expect(response).to.be.null;
@@ -1954,7 +1954,10 @@ describe('Collection', () => {
             c.add({a: 1});
             c.add({a: 2});
 
-            c.saving = true;
+            c._state.saving = true;
+
+            expect(c.saving).to.equal(true);
+
             c.save().then((response) => {
                 expect(response).to.be.null;
                 done();
@@ -2304,7 +2307,7 @@ describe('Collection', () => {
             let m2 = c.add({a: 2});
 
             moxios.withMock(() => {
-                c.fatal = true;
+                c._state.fatal = true;
 
                 c.save().then((response) => {
                     expect(c.fatal).to.equal(false);
@@ -2484,8 +2487,8 @@ describe('Collection', () => {
             let m2 = c.add({a: 2});
 
             moxios.withMock(() => {
-                m1.fatal = true;
-                m2.fatal = true;
+                m1._state.fatal = true;
+                m2._state.fatal = true;
 
                 c.save().catch((error) => {
                     expect(m1.fatal).to.equal(false);
@@ -2514,7 +2517,7 @@ describe('Collection', () => {
             let m2 = c.add({a: 2});
 
             moxios.withMock(() => {
-                c.fatal = true;
+                c._state.fatal = true;
 
                 c.save().catch((error) => {
                     expect(c.fatal).to.equal(false);
@@ -2906,7 +2909,7 @@ describe('Collection', () => {
                 routes() { return {fetch: '/fetch'}}
             }
 
-            c.loading = true;
+            c._state.loading = true;
 
             moxios.withMock(() => {
                 c.fetch().then((response) => {
@@ -2950,7 +2953,7 @@ describe('Collection', () => {
             }
 
             moxios.withMock(() => {
-                c.loading = false;
+                c._state.loading = false;
                 expect(c.loading).to.equal(false);
                 c.fetch();
                 expect(c.loading).to.equal(true);
@@ -3011,7 +3014,7 @@ describe('Collection', () => {
             }
 
             moxios.withMock(() => {
-                c.fatal = true;
+                c._state.fatal = true;
 
                 c.fetch().then((response) => {
                     expect(c.fatal).to.equal(false);
@@ -3061,7 +3064,7 @@ describe('Collection', () => {
             c.page(1);
 
             moxios.withMock(() => {
-                c.fatal = true;
+                c._state.fatal = true;
 
                 c.fetch().then((response) => {
                     expect(c.fatal).to.equal(false);
