@@ -379,7 +379,7 @@ class Collection extends Base {
 
         // Support using a predicate to remove all models it returns true for.
         // Alternatively support an object of values to filter by.
-        if (typeof model === "function" || _.isPlainObject(model)) {
+        if (typeof model === 'function' || _.isPlainObject(model)) {
             return this.remove(_.filter(this.models, model));
         }
 
@@ -712,7 +712,8 @@ class Collection extends Base {
             if ( ! Array.isArray(saved)) {
                 throw new ResponseError(
                     'Response data must be an array or empty',
-                    response);
+                    response
+                );
             }
 
             // Check that the number of models returned in the response matches
@@ -721,7 +722,8 @@ class Collection extends Base {
             if (saved.length !== saving.length) {
                 throw new ResponseError(
                     'Expected the same number of models in the response',
-                    response);
+                    response
+                );
             }
 
             // Update every model with its respective response data.

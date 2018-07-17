@@ -49,7 +49,7 @@ const copyFrom = function(source, target, keys) {
             Vue.set(target, key, {});
             copyFrom(value, target[key]);
 
-        } else if (_.isObject(value) && typeof value.clone === "function") {
+        } else if (_.isObject(value) && typeof value.clone === 'function') {
             Vue.set(target, key, value.clone());
 
         } else {
@@ -288,7 +288,7 @@ class Model extends Base {
             return;
         }
 
-        if (collection == null || typeof collection._uid === "undefined") {
+        if (collection == null || typeof collection._uid === 'undefined') {
             throw new Error('Collection is not valid');
         }
 
@@ -309,7 +309,7 @@ class Model extends Base {
             return;
         }
 
-        if (collection == null || typeof collection._uid === "undefined") {
+        if (collection == null || typeof collection._uid === 'undefined') {
             throw new Error('Collection is not valid');
         }
 
@@ -406,7 +406,7 @@ class Model extends Base {
      * @param {string|string[]|undefined} attribute
      */
     mutate(attribute) {
-        if (typeof attribute === "undefined") {
+        if (typeof attribute === 'undefined') {
             _.each(this._attributes, (value, attribute) => {
                 Vue.set(this._attributes, attribute, this.mutated(attribute, value));
             });
@@ -444,7 +444,7 @@ class Model extends Base {
         let active = _.cloneDeep(this._attributes);
 
         // Sync either specific attributes or all attributes if none provided.
-        if (typeof attribute === "undefined") {
+        if (typeof attribute === 'undefined') {
             Vue.set(this, '_reference', active);
 
         } else {
@@ -614,7 +614,7 @@ class Model extends Base {
                 let result = rule(value, attribute, this);
 
                 // Rules should return an error message if validation failed.
-                if (typeof result === "string") {
+                if (typeof result === 'string') {
                     errors.push(result);
                     valid = false;
 
@@ -630,7 +630,7 @@ class Model extends Base {
         // method. The expectation is that the validate function will return
         // `true` if valid, `false` if not, and handle its own errors.
         if (this.getOption('validateRecursively')) {
-            if (typeof _.get(value, 'validate') === "function") {
+            if (typeof _.get(value, 'validate') === 'function') {
                 valid = value.validate() && valid;
             }
         }
@@ -649,7 +649,7 @@ class Model extends Base {
      * @returns {boolean} `true` if the model passes validation.
      */
     validate(attributes) {
-        if (typeof attributes === "string") {
+        if (typeof attributes === 'string') {
             return this.validateAttribute(attributes);
 
         // Only validate the attributes that were specified.
@@ -657,7 +657,7 @@ class Model extends Base {
             attributes = _.pick(this._attributes, attributes);
 
         // Or validate all attributes if none were given.
-        } else if (typeof attributes === "undefined") {
+        } else if (typeof attributes === 'undefined') {
             attributes = this._attributes;
 
         } else {
@@ -722,7 +722,7 @@ class Model extends Base {
 
         // A fetch request must receive *some* data in return.
         if (_.isEmpty(attributes)) {
-            throw new ResponseError("No data in fetch response", response);
+            throw new ResponseError('No data in fetch response', response);
         }
 
         this.assign(attributes);
