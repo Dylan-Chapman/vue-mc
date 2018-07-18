@@ -42,8 +42,6 @@ class Collection extends Base {
         Vue.set(this, '_registry', {});   // Model registry.
         Vue.set(this, '_page', NO_PAGE);
 
-        this.clearState();
-
         // Set all given attributes.
         this.set(_.defaultsDeep({}, attributes, this.defaults()));
 
@@ -302,7 +300,7 @@ class Collection extends Base {
         this.onAdd(model);
 
         // We're assuming that the collection is not loading once a model is added.
-        Vue.set(this._state, 'loading', false);
+        Vue.set(this, 'loading', false);
 
         return model;
     }
@@ -447,7 +445,7 @@ class Collection extends Base {
         const newCollection = new (this.constructor)(models);
 
         // Apple the state from the current collection to the new collection
-        Vue.set(newCollection, "_state", this._state);
+        Vue.set(newCollection, '_state', this._state);
 
         return newCollection;
     }
@@ -722,8 +720,8 @@ class Collection extends Base {
             });
         }
 
-        Vue.set(this._state, 'saving', false);
-        Vue.set(this._state, 'fatal',  false);
+        Vue.set(this, 'saving', false);
+        Vue.set(this, 'fatal',  false);
 
         this.emit('save', {error: null });
     }
@@ -766,8 +764,8 @@ class Collection extends Base {
         // in the response are in the same order as they are in the collection.
         _.each(models, (model, index) => {
             model.setErrors(errors[index]);
-            Vue.set(model._state, 'saving', false);
-            Vue.set(model._state, 'fatal', false);
+            Vue.set(model, 'saving', false);
+            Vue.set(model, 'fatal', false);
         });
     }
 
@@ -831,8 +829,8 @@ class Collection extends Base {
 
         this.setErrors(errors);
 
-        Vue.set(this._state, 'fatal', false);
-        Vue.set(this._state, 'saving', false);
+        Vue.set(this, 'fatal', false);
+        Vue.set(this, 'saving', false);
     }
 
     /**
@@ -847,8 +845,8 @@ class Collection extends Base {
             model.onFatalSaveFailure(error, response);
         });
 
-        Vue.set(this._state, 'fatal', true);
-        Vue.set(this._state, 'saving', false);
+        Vue.set(this, 'fatal', true);
+        Vue.set(this, 'saving', false);
     }
 
     /**
@@ -965,8 +963,8 @@ class Collection extends Base {
             this.replace(models);
         }
 
-        Vue.set(this._state, 'loading', false);
-        Vue.set(this._state, 'fatal', false);
+        Vue.set(this, 'loading', false);
+        Vue.set(this, 'fatal', false);
 
         this.emit('fetch', {error: null });
     }
@@ -979,8 +977,8 @@ class Collection extends Base {
     onFetchFailure(error) {
         this.clearErrors();
 
-        Vue.set(this._state, 'fatal', true);
-        Vue.set(this._state, 'loading', false);
+        Vue.set(this, 'fatal', true);
+        Vue.set(this, 'loading', false);
 
         this.emit('fetch', {error});
     }
@@ -999,7 +997,7 @@ class Collection extends Base {
 
         // Because we're fetching new data, we can assume that this collection
         // is now loading. This allows the template to indicate a loading state.
-        Vue.set(this._state, 'loading', true);
+        Vue.set(this, 'loading', true);
     }
 
     /**
@@ -1008,8 +1006,8 @@ class Collection extends Base {
      * @param {Object} response
      */
     onDeleteSuccess(response) {
-        Vue.set(this._state, 'deleting', false);
-        Vue.set(this._state, 'fatal', false);
+        Vue.set(this, 'deleting', false);
+        Vue.set(this, 'fatal', false);
 
         _.each(this.getDeletingModels(), (model) => {
             model.onDeleteSuccess(response);
@@ -1025,8 +1023,8 @@ class Collection extends Base {
      * @param {Object} response
      */
     onDeleteFailure(error) {
-        Vue.set(this._state, 'fatal', true);
-        Vue.set(this._state, 'deleting', false);
+        Vue.set(this, 'fatal', true);
+        Vue.set(this, 'deleting', false);
 
         _.each(this.getDeletingModels(), (model) => {
             model.onDeleteFailure(error);
@@ -1047,7 +1045,7 @@ class Collection extends Base {
 
         // Don't save if we're already busy saving this collection.
         // This prevents things like accidental double clicks.
-        if (this._state.saving) {
+        if (this.saving) {
             return false;
         }
 
@@ -1073,7 +1071,7 @@ class Collection extends Base {
             throw new ValidationError(this.getErrors());
         }
 
-        Vue.set(this._state, 'saving', true);
+        Vue.set(this, 'saving', true);
     }
 
     /**
@@ -1130,7 +1128,7 @@ class Collection extends Base {
 
         // Don't save if we're already busy saving this collection.
         // This prevents things like accidental double clicks.
-        if (this._state.deleting) {
+        if (this.deleting) {
             return false;
         }
 
@@ -1142,7 +1140,7 @@ class Collection extends Base {
             return true;
         }
 
-        Vue.set(this._state, 'deleting', true);
+        Vue.set(this, 'deleting', true);
     }
 
     /**

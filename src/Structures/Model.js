@@ -112,8 +112,6 @@ class Model extends Base {
         Vue.set(this, '_mutations', {});  // Mutator cache.
         Vue.set(this, '_errors', {});  // Validation errors.
 
-        this.clearState();
-
         // Cache certain methods that don't need to be evaluated more than once.
         this.memoize();
 
@@ -461,7 +459,7 @@ class Model extends Base {
         // Create dynamic accessors and mutations so that we can update the
         // model directly while also keeping the model attributes in sync.
         Object.defineProperty(this, attribute, {
-            get: ()      => this.get(attribute),
+            get: () => this.get(attribute),
             set: (value) => this.set(attribute, value),
         });
     }
@@ -717,8 +715,8 @@ class Model extends Base {
 
         this.assign(attributes);
 
-        Vue.set(this._state, 'fatal', false);
-        Vue.set(this._state, 'loading', false);
+        Vue.set(this, 'fatal', false);
+        Vue.set(this, 'loading', false);
 
         this.emit('fetch', {error: null});
     }
@@ -729,8 +727,8 @@ class Model extends Base {
      * @param {Error}  error
      */
     onFetchFailure(error) {
-        Vue.set(this._state, 'fatal', true);
-        Vue.set(this._state, 'loading', false);
+        Vue.set(this, 'fatal', true);
+        Vue.set(this, 'loading', false);
 
         this.emit('fetch', {error});
     }
@@ -932,7 +930,7 @@ class Model extends Base {
      */
     clearErrors() {
         this.setErrors({});
-        Vue.set(this._state, 'fatal', false);
+        Vue.set(this, 'fatal', false);
     }
 
     /**
@@ -950,8 +948,8 @@ class Model extends Base {
             this.update(response.getData());
         }
 
-        Vue.set(this._state, 'saving', false);
-        Vue.set(this._state, 'fatal', false);
+        Vue.set(this, 'saving', false);
+        Vue.set(this, 'fatal', false);
 
         // Automatically add to all registered collections.
         this.addToAllCollections();
@@ -974,8 +972,8 @@ class Model extends Base {
 
         this.setErrors(errors);
 
-        Vue.set(this._state, 'fatal', false);
-        Vue.set(this._state, 'saving', false);
+        Vue.set(this, 'fatal', false);
+        Vue.set(this, 'saving', false);
     }
 
     /**
@@ -988,8 +986,8 @@ class Model extends Base {
     onFatalSaveFailure(error) {
         this.clearErrors();
 
-        Vue.set(this._state, 'fatal', true);
-        Vue.set(this._state, 'saving', false);
+        Vue.set(this, 'fatal', true);
+        Vue.set(this, 'saving', false);
     }
 
     /**
@@ -1015,8 +1013,8 @@ class Model extends Base {
         this.clear();
         this.removeFromAllCollections();
 
-        Vue.set(this._state, 'deleting', false);
-        Vue.set(this._state, 'fatal', false);
+        Vue.set(this, 'deleting', false);
+        Vue.set(this, 'fatal', false);
 
         this.emit('delete', {error: null});
     }
@@ -1027,8 +1025,8 @@ class Model extends Base {
      * @param {Error}  error
      */
     onDeleteFailure(error) {
-        Vue.set(this._state, 'deleting', false);
-        Vue.set(this._state, 'fatal', true);
+        Vue.set(this, 'deleting', false);
+        Vue.set(this, 'fatal', true);
 
         this.emit('delete', {error});
     }
@@ -1042,11 +1040,11 @@ class Model extends Base {
 
         // Don't fetch if already fetching. This prevents accidental requests
         // that sometimes occur as a result of a double-click.
-        if (this._state.loading) {
+        if (this.loading) {
             return false;
         }
 
-        Vue.set(this._state, 'loading', true);
+        Vue.set(this, 'loading', true);
     }
 
     /**
@@ -1075,7 +1073,7 @@ class Model extends Base {
 
         // Don't save if we're already busy saving this model.
         // This prevents things like accidental double-clicks.
-        if (this._state.saving) {
+        if (this.saving) {
             return false;
         }
 
@@ -1094,7 +1092,7 @@ class Model extends Base {
             throw new ValidationError(this.errors);
         }
 
-        Vue.set(this._state, 'saving', true);
+        Vue.set(this, 'saving', true);
     }
 
     /**
@@ -1105,11 +1103,11 @@ class Model extends Base {
     onDelete() {
 
         // Don't save if we're already busy deleting this model.
-        if (this._state.deleting) {
+        if (this.deleting) {
             return false;
         }
 
-        Vue.set(this._state, 'deleting', true);
+        Vue.set(this, 'deleting', true);
     }
 }
 

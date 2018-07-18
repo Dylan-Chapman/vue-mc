@@ -7,22 +7,6 @@ import { autobind } from '../utils.js'
  * Base class for all things common between Model and Collection.
  */
 class Base {
-    get loading() {
-        return this._state.loading;
-    }
-
-    get saving() {
-        return this._state.saving;
-    }
-
-    get deleting() {
-        return this._state.deleting;
-    }
-
-    get fatal() {
-        return this._state.fatal;
-    }
-
     constructor(options) {
         autobind(this);
 
@@ -35,11 +19,20 @@ class Base {
             writable: false,
         });
 
+
         Vue.set(this, '_listeners', {});  // Event listeners
         Vue.set(this, '_options', {});  // Internal option store
 
+        this.clearState();
         this.setOptions(options);
         this.boot();
+
+        Object.keys(this._state).forEach(state => {
+            Object.defineProperty(this, state, {
+                get: () => this._state[state],
+                set: (value) => Vue.set(this._state, state, value),
+            });
+        });
     }
 
     /**
