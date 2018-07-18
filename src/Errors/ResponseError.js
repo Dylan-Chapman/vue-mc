@@ -1,8 +1,9 @@
 export default class ResponseError {
     constructor(message, response) {
-        this.message  = message;
+        this.name = 'ResponseError';
+        this.message = message;
         this.response = response;
-        this.stack    = (new Error()).stack;
+        this.stack = (new Error()).stack;
     }
 
     toString() {

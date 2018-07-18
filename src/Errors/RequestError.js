@@ -1,9 +1,10 @@
 export default class RequestError {
     constructor(error, response) {
-        this.error    = error;
+        this.name = 'RequestError';
+        this.error = error;
         this.response = response;
-        this.stack    = (new Error()).stack;
-        this.message  = error.message;
+        this.stack = (new Error()).stack;
+        this.message = error.message;
     }
 
     toString() {
