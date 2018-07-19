@@ -275,7 +275,7 @@ class Model extends Base {
     /**
      * Registers a collection on this model. When this model is created it will
      * automatically be added to the collection. Similarly, when this model is
-     * delete it will be remove from the collection. Registering the same
+     * deleted it will be removed from the collection. Registering the same
      * collection more than once has no effect.
      *
      * @param {Collection} collection
