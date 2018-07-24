@@ -1,25 +1,24 @@
-import * as _ from 'lodash'
+import { get as _get } from 'lodash'
 
 class Response {
-
     constructor(response) {
         this.response = response;
     }
 
     getData() {
-        return _.get(this.response, 'data', null);
+        return _get(this.response, 'data', null);
     }
 
     getStatus() {
-        return _.get(this.response, 'status');
+        return _get(this.response, 'status');
     }
 
     getHeaders() {
-        return _.get(this.response, 'headers', {});
+        return _get(this.response, 'headers', {});
     }
 
     getValidationErrors() {
-        return _.get(this.response, 'data', null);
+        return _get(this.response, 'data', null);
     }
 }
 

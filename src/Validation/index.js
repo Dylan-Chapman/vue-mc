@@ -1,23 +1,41 @@
-import { en_us }        from './locale.js'
-import isAlpha          from 'validator/lib/isAlpha'
-import isAlphanumeric   from 'validator/lib/isAlphanumeric'
-import isBase64         from 'validator/lib/isBase64'
-import isCreditCard     from 'validator/lib/isCreditCard'
-import isEmail          from 'validator/lib/isEmail'
-import isIP             from 'validator/lib/isIP'
-import isISO8601        from 'validator/lib/isISO8601'
-import isJSON           from 'validator/lib/isJSON'
-import isURL            from 'validator/lib/isURL'
-import isUUID           from 'validator/lib/isUUID'
-import * as _           from 'lodash';
+import { en_us } from './locale.js'
+import isAlpha from 'validator/lib/isAlpha'
+import isAlphanumeric from 'validator/lib/isAlphanumeric'
+import isBase64 from 'validator/lib/isBase64'
+import isCreditCard from 'validator/lib/isCreditCard'
+import isEmail from 'validator/lib/isEmail'
+import isIP from 'validator/lib/isIP'
+import isISO8601 from 'validator/lib/isISO8601'
+import isJSON from 'validator/lib/isJSON'
+import isURL from 'validator/lib/isURL'
+import isUUID from 'validator/lib/isUUID'
 import {
-    format              as formatDate,
-    isAfter             as isAfterDate,
-    isBefore            as isBeforeDate,
-    isValid             as isValidDate,
-    parse               as parseDate,
+    deburr as _deburr,
+    each as _each,
+    get as _get,
+    gt as _gt,
+    gte as _gte,
+    includes as _includes,
+    isEmpty as _isEmpty,
+    isEqual as _isEqual,
+    isObject as _isObject,
+    lt as _lt,
+    lte as _lte,
+    pick as _pick,
+    set as _set,
+    size as _size,
+    split as _split,
+    stubTrue as _stubTrue,
+    template as _template,
+} from 'lodash'
+import {
+    format as formatDate,
+    isAfter as isAfterDate,
+    isBefore as isBeforeDate,
+    isValid as isValidDate,
+    parse as parseDate,
     toDate,
-}                       from "date-fns";
+} from "date-fns"
 
 // We want to set the messages a superglobal so that imports across files
 // reference the same messages object.
@@ -60,8 +78,8 @@ export const messages =
     register(bundle) {
         let locale = bundle.locale ? bundle.locale.toString().toLowerCase() : bundle.locale;
 
-        _.each(_.get(bundle, 'messages', {}), (message, name) => {
-            _.set(this.$locales, [locale, name], _.template(message));
+        _each(_get(bundle, 'messages', {}), (message, name) => {
+            _set(this.$locales, [locale, name], _template(message));
         });
     }
 
@@ -72,19 +90,19 @@ export const messages =
      * @param {string} format
      */
     set(name, format, locale) {
-        let template = typeof format === "string" ? _.template(format) : format;
+        let template = typeof format === "string" ? _template(format) : format;
 
         // Use the given locale.
         if (locale) {
-            _.set(this.$locales, [locale, name], template);
+            _set(this.$locales, [locale, name], template);
 
         // Otherwise use the active locale.
         } else if (this.$locale) {
-            _.set(this.$locales, [this.$locale, name], template);
+            _set(this.$locales, [this.$locale, name], template);
 
         // Otherwise fall back to the default locale.
         } else {
-            _.set(this.$locales, [this.$fallback, name], template);
+            _set(this.$locales, [this.$fallback, name], template);
         }
     }
 
@@ -101,9 +119,9 @@ export const messages =
         // Attempt to find the name using the active locale, falling back to the
         // active locale's language, and finally falling back to the default.
         let template =
-            _.get(this.$locales, [this.$locale, name],
-            _.get(this.$locales, [_.split(this.$locale, '-')[0], name],
-            _.get(this.$locales, [this.$fallback, name])));
+            _get(this.$locales, [this.$locale, name],
+            _get(this.$locales, [_split(this.$locale, '-')[0], name],
+            _get(this.$locales, [this.$fallback, name])));
 
         // Fall back to a blank string so that we don't potentially
         // leak message names or context data into the template.
@@ -111,7 +129,7 @@ export const messages =
             return '';
         }
 
-        return template(data);
+        return _template(data);
     }
 }
 
@@ -149,9 +167,9 @@ export const messages =
  * @returns {Function} Validation rule.
  */
 export const rule = function(config) {
-    let name = _.get(config, 'name');
-    let data = _.get(config, 'data', {});
-    let test = _.get(config, 'test', _.stubTrue);
+    let name = _get(config, 'name');
+    let data = _get(config, 'data', {});
+    let test = _get(config, 'test', _stubTrue);
 
     /**
      * This is the function that is called when using this rule.
@@ -210,7 +228,7 @@ export const rule = function(config) {
         Object.assign(data, {attribute, value });
 
         // This would be a custom format explicitly set on this rule.
-        let format = _.get($rule, '_format');
+        let format = _get($rule, '_format');
 
         // Use the default message if an explicit format isn't set.
         if ( ! format) {
@@ -219,7 +237,7 @@ export const rule = function(config) {
 
         // Replace the custom format with a template if it's still a string.
         if (typeof format === "string") {
-            $rule._format = format = _.template(format);
+            $rule._format = format = _template(format);
         }
 
         return format(data);
@@ -229,7 +247,7 @@ export const rule = function(config) {
      * @returns {Function} A copy of this rule, so that appending to a chain or
      *                     setting a custom format doesn't modify the base rule.
      */
-    $rule.copy = () => Object.assign(rule({name, test, data }), _.pick($rule, [
+    $rule.copy = () => Object.assign(rule({name, test, data }), _pick($rule, [
         '_format',
         '_and',
         '_or',
@@ -285,7 +303,7 @@ export const after = function(date) {
  */
 export const alpha = rule({
     name: 'alpha',
-    test: (value) => typeof value === "string" && isAlpha(_.deburr(value)),
+    test: (value) => typeof value === "string" && isAlpha(_deburr(value)),
 })
 
 /**
@@ -293,7 +311,7 @@ export const alpha = rule({
  */
 export const alphanumeric = rule({
     name: 'alphanumeric',
-    test: (value) => typeof value === "string" && isAlphanumeric(_.deburr(value)),
+    test: (value) => typeof value === "string" && isAlphanumeric(_deburr(value)),
 })
 
 /**
@@ -346,8 +364,8 @@ export const between = function(min, max, inclusive = true) {
             let _value = +(typeof value === "string" ? toDate(value) : value);
 
             return inclusive
-                ? _.gte(_value, _min) && _.lte(_value, _max)
-                : _.gt (_value, _min) && _.lt (_value, _max);
+                ? _gte(_value, _min) && _lte(_value, _max)
+                : _gt(_value, _min) && _lt(_value, _max);
         },
     })
 }
@@ -418,7 +436,7 @@ export const email = rule({
  */
 export const empty = rule({
     name: 'empty',
-    test: _.isEmpty,
+    test: _isEmpty,
 })
 
 /**
@@ -435,7 +453,7 @@ export const equals = function(other) {
     return rule({
         name: 'equals',
         data: {other},
-        test: (value) => _.isEqual(value, other),
+        test: (value) => _isEqual(value, other),
     })
 }
 
@@ -446,7 +464,7 @@ export const gt = function(min) {
     return rule({
         name: 'gt',
         data: {min},
-        test: (value) => _.gt(value, min),
+        test: (value) => _gt(value, min),
     })
 }
 
@@ -457,7 +475,7 @@ export const gte = function(min) {
     return rule({
         name: 'gte',
         data: {min},
-        test: (value) => _.gte(value, min),
+        test: (value) => _gte(value, min),
     })
 }
 
@@ -532,7 +550,7 @@ export const length = function(min, max) {
         return rule({
             name: 'length',
             data: {min, max},
-            test: (value) => _.size(value) >= min,
+            test: (value) => _size(value) >= min,
         })
     }
 
@@ -541,7 +559,7 @@ export const length = function(min, max) {
         name: 'length_between',
         data: {min, max},
         test: (value) => {
-            let length = _.size(value);
+            let length = _size(value);
             return length >= min && length <= max;
         },
     })
@@ -554,7 +572,7 @@ export const lt = function(max) {
     return rule({
         name: 'lt',
         data: {max},
-        test: (value) => _.lt(value, max),
+        test: (value) => _lt(value, max),
     })
 }
 
@@ -565,7 +583,7 @@ export const lte = function(max) {
     return rule({
         name: 'lte',
         data: {max},
-        test: (value) => _.lte(value, max),
+        test: (value) => _lte(value, max),
     })
 }
 
@@ -608,7 +626,7 @@ export const negative = rule({
 export const not = function(...values) {
     return rule({
         name: 'not',
-        test: (value) => ! _.includes(values, value),
+        test: (value) => ! _includes(values, value),
     })
 }
 
@@ -634,7 +652,7 @@ export const numeric = rule({
  */
 export const object = rule({
     name: 'object',
-    test: (value) =>  _.isObject(value)
+    test: (value) =>  _isObject(value)
         && ! Array.isArray(value)
         && typeof value !== "function",
 })
@@ -662,7 +680,7 @@ export const same = function(other) {
     return rule({
         name: 'same',
         data: {other},
-        test: (value, attribute, model) => _.isEqual(value, model.get(other)),
+        test: (value, attribute, model) => _isEqual(value, model.get(other)),
     })
 }
 

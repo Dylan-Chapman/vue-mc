@@ -1,7 +1,21 @@
-import Request      from '../HTTP/Request.js'
-import Vue          from 'vue'
-import * as _       from 'lodash'
+import Request from '../HTTP/Request.js'
+import Vue from 'vue'
 import { autobind } from '../utils.js'
+import {
+    defaultTo as _defaultTo,
+    defaults as _defaults,
+    defaultsDeep as _defaultsDeep,
+    each as _each,
+    get as _get,
+    invoke as _invoke,
+    map as _map,
+    reduce as _reduce,
+    replace as _replace,
+    set as _set,
+    split as _split,
+    trim as _trim,
+    uniqueId as _uniqueId,
+} from 'lodash'
 
 /**
  * Base class for all things common between Model and Collection.
@@ -13,7 +27,7 @@ class Base {
         // Define an automatic unique ID. This is primarily to distinguish
         // between multiple instances of the same name and data.
         Object.defineProperty(this, '_uid', {
-            value: _.uniqueId(),
+            value: _uniqueId(),
             enumerable: false,
             configurable: false,
             writable: false,
@@ -99,18 +113,18 @@ class Base {
      * @param {Object} context  The context of the event, passed to listeners.
      */
     emit(event, context = {}) {
-        let listeners = _.get(this._listeners, event);
+        let listeners = _get(this._listeners, event);
 
         if ( ! listeners) {
             return;
         }
 
         // Create the context for the event.
-        context = _.defaults({}, context, this.getDefaultEventContext());
+        context = _defaults({}, context, this.getDefaultEventContext());
 
         // Run through each listener. If any of them return false, stop the
         // iteration and mark that the event wasn't handled by all listeners.
-        _.each(listeners, (listener) => listener(context));
+        _each(listeners, (listener) => listener(context));
     }
 
     /**
@@ -122,9 +136,9 @@ class Base {
      * @param {function} listener   The event listener, accepts context.
      */
     on(event, listener) {
-        let events = _.map(_.split(event, ','), _.trim);
+        let events = _map(_split(event, ','), _trim);
 
-        _.each(events, (event) => {
+        _each(events, (event) => {
             this._listeners[event] = this._listeners[event] || [];
             this._listeners[event].push(listener);
         });
@@ -169,13 +183,13 @@ class Base {
     }
 
     /**
-     * @param {Array|string} path     Option path resolved by `_.get`
+     * @param {Array|string} path     Option path resolved by `get`
      * @param {*}            fallback Fallback value if the option is not set.
      *
      * @returns {*} The value of the given option path.
      */
     getOption(path, fallback = null) {
-        return _.get(this._options, path, fallback);
+        return _get(this._options, path, fallback);
     }
 
     /**
@@ -192,7 +206,7 @@ class Base {
      * @param {*}      value
      */
     setOption(path, value) {
-        _.set(this._options, path, value);
+        _set(this._options, path, value);
     }
 
     /**
@@ -202,7 +216,7 @@ class Base {
      * @param {...Object} options One or more objects of options.
      */
     setOptions(...options) {
-        Vue.set(this, '_options', _.defaultsDeep(
+        Vue.set(this, '_options', _defaultsDeep(
             {},
             ...options, // Given options
             this.options(), // Instance defaults
@@ -216,7 +230,7 @@ class Base {
      * @return {Object}
      */
     getOptions() {
-        return _.defaultTo(this._options, {});
+        return _defaultTo(this._options, {});
     }
 
     /**
@@ -254,7 +268,7 @@ class Base {
             let replacements = this.getRouteReplacements(route, parameters);
 
             // Replace all route parameters with their replacement values.
-            return _.reduce(replacements, (result, value, parameter) => _.replace(result, parameter, value), route);
+            return _reduce(replacements, (result, value, parameter) => _replace(result, parameter, value), route);
         }
     }
 
@@ -395,7 +409,7 @@ class Base {
      * @returns {number} The HTTP status code that indicates a validation error.
      */
     getValidationErrorStatus() {
-        return _.defaultTo(this.getOption('validationErrorStatus'), 422);
+        return _defaultTo(this.getOption('validationErrorStatus'), 422);
     }
 
     /**
@@ -404,7 +418,7 @@ class Base {
     isBackendValidationError(error) {
 
         // The error must have a response for it to be a validation error.
-        if ( ! _.invoke(error, 'getResponse', false)) {
+        if ( ! _invoke(error, 'getResponse', false)) {
             return false;
         }
 
@@ -418,7 +432,7 @@ class Base {
      * @return {string|undefined} Route value by key.
      */
     getRoute(key, fallback) {
-        let route = _.get(this.routes(), key, _.get(this.routes(), fallback));
+        let route = _get(this.routes(), key, _get(this.routes(), fallback));
 
         if ( ! route) {
             throw new Error(`Invalid or missing route`);
@@ -497,7 +511,7 @@ class Base {
             }
 
             // Apply the default headers.
-            _.defaults(config.headers, this.getDefaultHeaders());
+            _defaults(config.headers, this.getDefaultHeaders());
 
             // Make the request.
             return this.getRequest(config).send()
@@ -528,7 +542,7 @@ class Base {
      * @returns {Promise}
      */
     fetch(options = {}) {
-        let config = () => _.defaults(options, {
+        let config = () => _defaults(options, {
             url: this.getFetchURL(),
             method: this.getFetchMethod(),
             params: this.getFetchQuery(),

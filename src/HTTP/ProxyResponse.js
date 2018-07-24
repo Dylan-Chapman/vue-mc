@@ -1,11 +1,13 @@
-import * as _ from 'lodash'
+import {
+    defaultTo as _defaultTo,
+    toSafeInteger as _toSafeInteger,
+} from 'lodash'
 
 export default class ProxyResponse {
-
     constructor(status, data = {}, headers = {}) {
-        this.data    = _.defaultTo(data, {});
-        this.headers = _.defaultTo(headers, {});
-        this.status  = _.toSafeInteger(status);
+        this.data = _defaultTo(data, {});
+        this.headers = _defaultTo(headers, {});
+        this.status = _toSafeInteger(status);
     }
 
     getData() {
