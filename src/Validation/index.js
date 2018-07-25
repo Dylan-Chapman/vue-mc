@@ -118,10 +118,15 @@ export const messages =
 
         // Attempt to find the name using the active locale, falling back to the
         // active locale's language, and finally falling back to the default.
-        let template =
-            _get(this.$locales, [this.$locale, name],
-            _get(this.$locales, [_split(this.$locale, '-')[0], name],
-            _get(this.$locales, [this.$fallback, name])));
+        let template = _get(
+            this.$locales,
+            [this.$locale, name],
+            _get(
+                this.$locales,
+                [_split(this.$locale, '-')[0], name],
+                _get(this.$locales, [this.$fallback, name])
+            )
+        );
 
         // Fall back to a blank string so that we don't potentially
         // leak message names or context data into the template.
@@ -129,7 +134,7 @@ export const messages =
             return '';
         }
 
-        return _template(data);
+        return template(data);
     }
 }
 
