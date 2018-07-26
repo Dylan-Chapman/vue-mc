@@ -5,37 +5,22 @@
 [![Latest Version](https://img.shields.io/npm/v/vue-mc.svg?style=flat-square)](https://www.npmjs.com/package/vue-mc)
 [![License](https://img.shields.io/npm/l/vue-mc.svg?style=flat-square)](https://github.com/FiguredLimited/vue-mc/blob/master/LICENSE)
 
-### Documentation
 
-Documentation is available at **[http://vuemc.io](http://vuemc.io)**
+### Fork
+This is a standalone fork of [https://github.com/FiguredLimited/vue-mc](https://github.com/FiguredLimited/vue-mc)
 
-### Development
 
-#### Install
+#### Installation
 
 ```
 yarn add @dylan-chapman/vue-mc
 ```
 
-#### Build
 
-```
-yarn build --watch
-```
+### Documentation
 
-#### Test
+Documentation for the original library is available at **[http://vuemc.io](http://vuemc.io)**. Separate documentation for this fork may come in the future.
 
-```
-yarn test --watch
-```
-
-#### Docs
-
-You will need to install jekyll to render and edit the documentation.
-
-```
-yarn docs
-```
 
 ### License
 
