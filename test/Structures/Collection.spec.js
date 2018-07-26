@@ -47,7 +47,7 @@ describe('Collection', () => {
             let m = new Model({}, null, {
                 methods: {
                     patch: 'CONSTRUCTOR',
-                }
+                },
             });
 
             expect(m.getOption('methods.patch')).to.equal('CONSTRUCTOR');
@@ -61,13 +61,13 @@ describe('Collection', () => {
                         methods: {
                             update: 'INSTANCE',
                             patch:  'INSTANCE',
-                        }
+                        },
                     }
                 }
             }({}, null, {
                 methods: {
                     patch: 'CONSTRUCTOR',
-                }
+                },
             });
 
             expect(m.getOption('methods.patch')).to.equal('CONSTRUCTOR');
@@ -226,7 +226,7 @@ describe('Collection', () => {
             let c = new class extends Collection {
                 routes() {
                     return {
-                        'fetch': 'http://domain.com/:page'
+                        'fetch': 'http://domain.com/:page',
                     }
                 }
                 getRouteResolver() {
@@ -606,7 +606,7 @@ describe('Collection', () => {
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
                         status: 200,
-                        response: [{id: 1},{id: 2}],
+                        response: [{id: 1}, {id: 2}],
                     })
                 })
             })
@@ -1534,7 +1534,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200
+                        status: 200,
                     })
                 })
             })
@@ -1632,7 +1632,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200
+                        status: 200,
                     })
                 })
             })
@@ -1656,7 +1656,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 500
+                        status: 500,
                     })
                 })
             })
@@ -1801,7 +1801,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 500
+                        status: 500,
                     })
                 })
             })
@@ -1824,7 +1824,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200
+                        status: 200,
                     })
                 })
             })
@@ -1850,7 +1850,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200
+                        status: 200,
                     })
                 })
             })
@@ -1875,7 +1875,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200
+                        status: 200,
                     })
                 })
             })
@@ -1900,7 +1900,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 500
+                        status: 500,
                     })
                 })
             })
@@ -1938,7 +1938,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200
+                        status: 200,
                     });
                 })
             })
@@ -2217,7 +2217,7 @@ describe('Collection', () => {
                     moxios.requests.mostRecent().respondWith({
                         status: 200,
                         response: [
-                            1, 2
+                            1, 2,
                         ],
                     });
                 })
@@ -2242,7 +2242,7 @@ describe('Collection', () => {
                     moxios.requests.mostRecent().respondWith({
                         status: 200,
                         response: [
-                            4, 5
+                            4, 5,
                         ],
                     });
                 })
@@ -2269,7 +2269,7 @@ describe('Collection', () => {
                     moxios.requests.mostRecent().respondWith({
                         status: 200,
                         response: [
-                            1, 2
+                            1, 2,
                         ],
                     });
                 })
@@ -2292,7 +2292,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200
+                        status: 200,
                     });
                 })
             })
@@ -2316,7 +2316,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200
+                        status: 200,
                     });
                 })
             })
@@ -2345,7 +2345,7 @@ describe('Collection', () => {
                         status: 200,
                         response: [
                             {id: 1, a: 10},
-                            {id: 2, a: 20}
+                            {id: 2, a: 20},
                         ],
                     });
                 })
@@ -2367,7 +2367,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200
+                        status: 200,
                     });
                 })
             })
@@ -2389,7 +2389,7 @@ describe('Collection', () => {
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
                         status: 422,
-                        response: '5'
+                        response: '5',
                     });
                 })
             })
@@ -2414,7 +2414,7 @@ describe('Collection', () => {
                         status: 422,
                         response: [
                             {a: ['Bad!']},
-                        ]
+                        ],
                     });
                 })
             })
@@ -2442,7 +2442,7 @@ describe('Collection', () => {
                         response: [
                             {a: ['Error!']},
                             {a: ['Invalid!']},
-                        ]
+                        ],
                     });
                 })
             })
@@ -2472,7 +2472,7 @@ describe('Collection', () => {
                         response: {
                             [m1.identifier()]: {a: ['Error!']},
                             [m3.identifier()]: {a: ['Bad!']},
-                        }
+                        },
                     });
                 })
             })
@@ -2502,7 +2502,7 @@ describe('Collection', () => {
                         response: [
                             {a: ['A!']},
                             {a: ['B!']},
-                        ]
+                        ],
                     });
                 })
             })
@@ -2530,7 +2530,7 @@ describe('Collection', () => {
                         response: [
                             {a: ['A!']},
                             {a: ['B!']},
-                        ]
+                        ],
                     });
                 })
             })
@@ -2655,7 +2655,7 @@ describe('Collection', () => {
                         response: [
                             {a: 'A!'},
                             {a: 'B!'},
-                        ]
+                        ],
                     });
                 })
             })
@@ -2942,7 +2942,7 @@ describe('Collection', () => {
             moxios.wait(() => {
                 moxios.requests.mostRecent().respondWith({
                     status: 200,
-                    response: []
+                    response: [],
                 });
             });
         })
@@ -2980,7 +2980,7 @@ describe('Collection', () => {
                         status: 200,
                         response: [
                             {id: 100},
-                        ]
+                        ],
                     });
                 });
             })
@@ -3002,7 +3002,7 @@ describe('Collection', () => {
                         status: 200,
                         response: [
                             {id: 1},
-                        ]
+                        ],
                     });
                 });
             })
@@ -3026,7 +3026,7 @@ describe('Collection', () => {
                         status: 200,
                         response: [
                             {id: 1},
-                        ]
+                        ],
                     });
                 });
             })
@@ -3040,7 +3040,7 @@ describe('Collection', () => {
             c.page(1);
 
             moxios.withMock(() => {
-                 c.fetch().then((response) => {
+                c.fetch().then((response) => {
                     expect(c.loading).to.equal(false);
                     done();
                 });
@@ -3050,7 +3050,7 @@ describe('Collection', () => {
                         status: 200,
                         response: [
                             {id: 1},
-                        ]
+                        ],
                     });
                 });
             })
@@ -3076,7 +3076,7 @@ describe('Collection', () => {
                         status: 200,
                         response: [
                             {id: 1},
-                        ]
+                        ],
                     });
                 });
             })
@@ -3098,7 +3098,7 @@ describe('Collection', () => {
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
                         status: 200,
-                        response: []
+                        response: [],
                     });
                 });
             })
@@ -3123,7 +3123,7 @@ describe('Collection', () => {
                         status: 200,
                         response: [
                             {a: 1},
-                        ]
+                        ],
                     });
                 });
             })
@@ -3142,7 +3142,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200
+                        status: 200,
                     });
                 });
             })

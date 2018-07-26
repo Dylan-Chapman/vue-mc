@@ -3,7 +3,6 @@ import ResponseError from '../../src/Errors/ResponseError.js'
 import Response from '../../src/HTTP/Response.js'
 
 describe('ResponseError', () => {
-
     describe('getResponse', () => {
         it('should return response', () => {
             let response = new Response({a: 1});
