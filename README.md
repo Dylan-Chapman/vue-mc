@@ -14,7 +14,7 @@ Documentation is available at **[http://vuemc.io](http://vuemc.io)**
 #### Install
 
 ```
-yarn add @Dylan-Chapman/vue-mc
+yarn add @dylan-chapman/vue-mc
 ```
 
 #### Build
