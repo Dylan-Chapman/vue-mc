@@ -1,6 +1,6 @@
 {
-    "name": "vue-mc",
-    "version": "0.2.4",
+    "name": "@Dylan-Chapman/vue-mc",
+    "version": "0.3.0",
     "description": "",
     "license": "MIT",
     "main": "vue-mc.js",
@@ -21,12 +21,12 @@
         "vue-mc.es.js"
     ],
     "bugs": {
-        "url": "https://github.com/FiguredLimited/vue-mc/issues"
+        "url": "https://github.com/Dylan-Chapman/vue-mc/issues"
     },
-    "homepage": "https://github.com/FiguredLimited/vue-mc",
+    "homepage": "https://github.com/Dylan-Chapman/vue-mc",
     "repository": {
         "type": "git",
-        "url": "https://github.com/FiguredLimited/vue-mc.git"
+        "url": "https://github.com/Dylan-Chapman/vue-mc.git"
     },
     "author": {
         "name": "Rudi Theunissen",

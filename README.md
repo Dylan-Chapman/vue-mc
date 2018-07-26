@@ -13,16 +13,8 @@ Documentation is available at **[http://vuemc.io](http://vuemc.io)**
 
 #### Install
 
-Install [`yarn`](https://yarnpkg.com/en/) if you don't already have it available:
-
 ```
-sudo npm install -g yarn
-```
-
-Install the dependencies:
-
-```
-yarn
+yarn add @Dylan-Chapman/vue-mc
 ```
 
 #### Build
