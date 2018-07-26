@@ -487,50 +487,46 @@ class Base {
      * @param  {function}   onSuccess   Called when the request was successful.
      * @param  {function}   onFailure   Called when the request failed.
      */
-    request(config, onRequest, onSuccess, onFailure) {
-        return new Promise((resolve, reject) => {
+    async request(config, onRequest, onSuccess, onFailure) {
+        let check = await onRequest();
 
-            let check = onRequest();
+        // Request should be skipped but the promise should not be resolved.
+        if (check === false) {
+            return;
+        }
 
-            // Request should be skipped but the promise should not be resolved.
-            if (check === false) {
-                return;
+        // Request should be skipped but should be considered successful.
+        if (check === true) {
+            onSuccess(null);
+            return null;
+        }
+
+        // Support passing the request configuration as a function, to allow
+        // for deferred resolution of certain values that may have changed
+        // during the call to "onRequest".
+        if (typeof config === "function") {
+            config = config();
+        }
+
+        // Apply the default headers.
+        _defaults(config.headers, this.getDefaultHeaders());
+
+        // Make the request.
+        try {
+            const response = await this.getRequest(config).send();
+
+            onSuccess(response);
+
+            return response;
+        } catch( error ) {
+            try {
+                onFailure(error);
+            } catch( fatalError ) {
+                throw fatalError
             }
 
-            // Request should be skipped but should be considered successful.
-            if (check === true) {
-                onSuccess(null);
-                return resolve(null);
-            }
-
-            // Support passing the request configuration as a function, to allow
-            // for deferred resolution of certain values that may have changed
-            // during the call to "onRequest".
-            if (typeof config === "function") {
-                config = config();
-            }
-
-            // Apply the default headers.
-            _defaults(config.headers, this.getDefaultHeaders());
-
-            // Make the request.
-            return this.getRequest(config).send()
-
-                // Success
-                .then((response) => {
-                    onSuccess(response);
-                    return resolve(response);
-                })
-
-                // Failure
-                .catch((error) => {
-                    onFailure(error);
-                    return reject(error);
-                })
-
-                // Failure fallback, for errors that occur in `onFailure`.
-                .catch((error) => reject(error));
-        });
+            throw error;
+        }
     }
 
     /**

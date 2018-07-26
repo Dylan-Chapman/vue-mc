@@ -639,7 +639,9 @@ class Model extends Base {
         // `true` if valid, `false` if not, and handle its own errors.
         if (this.getOption('validateRecursively')) {
             if (typeof _get(value, 'validate') === 'function') {
-                valid = await value.validate() && valid;
+                const valueValid = await value.validate();
+
+                valid = valueValid && valid;
             }
         }
 
@@ -658,7 +660,9 @@ class Model extends Base {
      */
     async validate(attributes) {
         if (typeof attributes === 'string') {
-            return await this.validateAttribute(attributes);
+            const attributeValid = await this.validateAttribute(attributes);
+
+            return attributeValid;
 
         // Only validate the attributes that were specified.
         } else if (Array.isArray(attributes)) {
@@ -674,10 +678,13 @@ class Model extends Base {
             );
         }
 
-        return await _reduce(attributes, async (valid, value, attribute) =>
-            await this.validateAttribute(attribute) && valid,
-            true
-        );
+        const valid = await _reduce(attributes, async (valid, value, attribute) => {
+            const attributeValid = await this.validateAttribute(attribute);
+
+            return attributeValid && valid;
+        }, true);
+
+        return valid;
     }
 
     /**
