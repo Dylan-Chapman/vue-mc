@@ -46,7 +46,7 @@
         "yoda": ["warn","never",{}],
         "comma-spacing": ["warn",{"before":false,"after":true}],
         "eol-last": "warn",
-        "indent": ["warn",4],
+        "indent": ["warn",4, {"SwitchCase": 1}],
         "space-infix-ops": "warn",
         "spaced-comment": ["warn","always"],
         "arrow-spacing": ["warn",{"before":true,"after":true}],
