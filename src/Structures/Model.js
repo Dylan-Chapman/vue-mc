@@ -7,6 +7,7 @@ import {
     defaultTo as _defaultTo,
     defaultsDeep as _defaultsDeep,
     each as _each,
+    filter as _filter,
     flow as _flow,
     get as _get,
     has as _has,
@@ -15,6 +16,7 @@ import {
     isEmpty as _isEmpty,
     isEqual as _isEqual,
     isObject as _isObject,
+    isObjectLike as _isObjectLike,
     isPlainObject as _isPlainObject,
     keys as _keys,
     mapValues as _mapValues,
@@ -596,7 +598,7 @@ class Model extends Base {
     /**
      * Determines if the model has an attribute.
      *
-     * @param  {string}  attribute
+     * @param  {string} attribute The attribute to check the existence of
      * @returns {boolean} `true` if an attribute exists, `false` otherwise.
      *                   Will return true if the object exists but is undefined.
      */
@@ -605,50 +607,49 @@ class Model extends Base {
     }
 
     /**
+     * @param {string} attribute The attribute to get validation rules for
+     * @return {Array} Array of validation rules
+     */
+    getValidateRules(attribute) {
+        return [].concat(_get(this.validation(), attribute, []) || []);
+    }
+
+    /**
      * Validates a specific attribute of this model, and sets errors for it.
      *
      * @returns {boolean} `true` if valid, `false` otherwise.
      */
-    async validateAttribute(attribute) {
-        let value  = this.get(attribute);
-        let rules  = this.validation();
-        let valid  = true;
-        let errors = [];
-
-        if (attribute in rules) {
-            let ruleset = [].concat(rules[attribute] || []);
-
-            await _each(ruleset, async (rule) => {
-                let result = await rule(value, attribute, this);
-
-                // Rules should return an error message if validation failed.
-                if (typeof result === 'string') {
-                    errors.push(result);
-                    valid = false;
-
-                    // Break early if we're only interested in the first error.
-                    if (this.getOption('useFirstErrorOnly')) {
-                        return false;
-                    }
-                }
-            });
+    validateAttribute(attribute) {
+        if (!this.has(attribute)) {
+            return Promise.reject(new Error(`'${attribute}' is not defined`));
         }
 
-        // Defer validation if an attribute is an object that has a `validate`
-        // method. The expectation is that the validate function will return
-        // `true` if valid, `false` if not, and handle its own errors.
-        if (this.getOption('validateRecursively')) {
-            if (typeof _get(value, 'validate') === 'function') {
-                const valueValid = await value.validate();
+        let value = this.get(attribute);
+        let rules = this.getValidateRules(attribute);
+        let tasks = rules.map((rule) => rule(value, attribute, this));
 
-                valid = valueValid && valid;
+        // Check if any nested values should be validated also.
+        if (this.getOption('validateRecursively')) {
+            if (value && typeof value.validate === 'function') {
+                tasks.push(value.validate());
             }
         }
 
-        // Set the errors for the attribute.
-        this.setAttributeErrors(attribute, errors);
+        return Promise.all(tasks).then((errors) => {
 
-        return valid;
+            // Errors will always be messages or nested error objects.
+            errors = _filter(errors, (e) => typeof e === 'string' || _isObject(e));
+
+            // Set errors for the model being validated.
+            this.setAttributeErrors(attribute, errors);
+            
+            // Check to see if we should yield only the first error.
+            if (this.getOption('useFirstErrorOnly') && ! _isEmpty(errors)) {
+                return _head(errors);
+            }
+
+            return errors;
+        });
     }
 
     /**
@@ -658,33 +659,34 @@ class Model extends Base {
      *
      * @returns {boolean} `true` if the model passes validation.
      */
-    async validate(attributes) {
-        if (typeof attributes === 'string') {
-            const attributeValid = await this.validateAttribute(attributes);
-
-            return attributeValid;
-
-        // Only validate the attributes that were specified.
-        } else if (Array.isArray(attributes)) {
-            attributes = _pick(this._attributes, attributes);
-
-        // Or validate all attributes if none were given.
-        } else if (typeof attributes === 'undefined') {
-            attributes = this._attributes;
-
-        } else {
-            throw new Error(
-                'Validation attributes must be an array, a string, or not given'
-            );
+    validate(attributes) {
+        if (typeof attributes === 'undefined') {
+            attributes = Object.keys(this._attributes);
         }
 
-        const valid = await _reduce(attributes, async (valid, value, attribute) => {
-            const attributeValid = await this.validateAttribute(attribute);
+        // Support a single, string attribute.
+        if (typeof attributes === 'string') {
+            return this.validateAttribute(attributes).then((errors) => {
+                return !_isEmpty(errors) ? {[attributes]: errors} : {};
+            });
+        }
 
-            return attributeValid && valid;
-        }, true);
+        // Support an array of attributes to validate.
+        if (Array.isArray(attributes)) {
+            let $errors = {};
 
-        return valid;
+            let tasks = attributes.map((attribute) => {
+                return this.validateAttribute(attribute).then((errors) => {
+                    if (!_isEmpty(errors)) {
+                        $errors[attribute] = errors;
+                    }
+                });
+            });
+
+            return Promise.all(tasks).then(() => $errors);
+        }
+
+        return Promise.reject(new Error('Invalid argument for validation attributes'));
     }
 
     /**
@@ -1067,14 +1069,16 @@ class Model extends Base {
      * @returns {boolean|undefined} `false` if the request should not be made.
      */
     onFetch() {
+        return new Promise((resolve, reject) => {
+            // Don't fetch if already fetching. This prevents accidental requests
+            // that sometimes occur as a result of a double-click.
+            if (this.loading) {
+                return resolve(Base.REQUEST_SKIP);
+            }
 
-        // Don't fetch if already fetching. This prevents accidental requests
-        // that sometimes occur as a result of a double-click.
-        if (this.loading) {
-            return false;
-        }
-
-        Vue.set(this, 'loading', true);
+            Vue.set(this, 'loading', true);
+            return resolve(Base.REQUEST_CONTINUE);
+        });
     }
 
     /**
@@ -1099,32 +1103,39 @@ class Model extends Base {
      *
      * @returns {boolean} `false` if the request should not be made.
      */
-    async onSave() {
+    onSave() {
+        return new Promise((resolve, reject) => {
 
-        // Don't save if we're already busy saving this model.
-        // This prevents things like accidental double-clicks.
-        if (this.saving) {
-            return false;
-        }
+            // Don't save if we're already busy saving this model.
+            // This prevents things like accidental double-clicks.
+            if (this.saving) {
+                return resolve(Base.REQUEST_SKIP);
+            }
 
-        // Don't save if no data has changed, but consider it a success.
-        if ( ! this.getOption('saveUnchanged') && ! this.changed()) {
-            return true;
-        }
+            // Don't save if no data has changed, but consider it a success.
+            if ( ! this.getOption('saveUnchanged') && ! this.changed()) {
+                return resolve(Base.REQUEST_REDUNDANT);
+            }
 
-        // Mutate attribute before we save if required to do so.
-        if (this.getOption('mutateBeforeSave')) {
-            this.mutate();
-        }
+            //
+            Vue.set(this, 'saving', true);
 
-        // Validate all attributes before saving.
-        const valid = await this.validate();
+            // Mutate attribute before we save if required to do so.
+            if (this.getOption('mutateBeforeSave')) {
+                this.mutate();
+            }
 
-        if ( !valid ) {
-            throw new ValidationError(this.errors);
-        }
+            return this.validate().then((errors) => {
+                if (_isEmpty(errors)) {
+                    return resolve(Base.REQUEST_CONTINUE);
+                }
 
-        Vue.set(this, 'saving', true);
+                Vue.set(this, 'saving', false);
+                console.log( "rejecting" );
+                reject(new ValidationError(this.errors));
+                return;
+            });
+        });
     }
 
     /**
@@ -1133,13 +1144,14 @@ class Model extends Base {
      * @returns {boolean} `false` if the request should not be made.
      */
     onDelete() {
-
-        // Don't save if we're already busy deleting this model.
         if (this.deleting) {
-            return false;
+            return Promise.resolve(Base.REQUEST_SKIP);
         }
 
-        Vue.set(this, 'deleting', true);
+        return new Promise((resolve, reject) => {
+            Vue.set(this, 'deleting', true);
+            resolve(Base.REQUEST_CONTINUE);
+        });
     }
 }
 

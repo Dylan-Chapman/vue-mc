@@ -1,4 +1,5 @@
 import Request from '../HTTP/Request.js'
+import ValidationError from '../Errors/ValidationError.js';
 import Vue from 'vue'
 import { autobind } from '../utils.js'
 import {
@@ -16,6 +17,10 @@ import {
     trim as _trim,
     uniqueId as _uniqueId,
 } from 'lodash'
+
+const REQUEST_CONTINUE = 0;
+const REQUEST_REDUNDANT = 1;
+const REQUEST_SKIP = 2;
 
 /**
  * Base class for all things common between Model and Collection.
@@ -412,6 +417,10 @@ class Base {
         return _defaultTo(this.getOption('validationErrorStatus'), 422);
     }
 
+    isValidationError(error) {
+        return error && error instanceof ValidationError;
+    }
+
     /**
      * @returns {boolean} `true` if the response indicates a validation error.
      */
@@ -487,46 +496,47 @@ class Base {
      * @param  {function}   onSuccess   Called when the request was successful.
      * @param  {function}   onFailure   Called when the request failed.
      */
-    async request(config, onRequest, onSuccess, onFailure) {
-        let check = await onRequest();
+    request(config, onRequest, onSuccess, onFailure) {
+        return new Promise((resolve, reject) => {
+            return onRequest().then((status) => {
+                switch (status) {
+                    case REQUEST_CONTINUE:
+                        break;
+                    case REQUEST_SKIP:
+                        return;
+                    case REQUEST_REDUNDANT: // Skip, but consider it a success.
+                        onSuccess(null);
+                        resolve(null);
+                        return;
+                }
 
-        // Request should be skipped but the promise should not be resolved.
-        if (check === false) {
-            return;
-        }
+                // Support passing the request configuration as a function, to allow
+                // for deferred resolution of certain values that may have changed
+                // during the call to "onRequest".
+                if (typeof config === "function") {
+                    config = config();
+                }
 
-        // Request should be skipped but should be considered successful.
-        if (check === true) {
-            onSuccess(null);
-            return null;
-        }
+                // Apply the default headers.
+                _defaults(config.headers, this.getDefaultHeaders());
 
-        // Support passing the request configuration as a function, to allow
-        // for deferred resolution of certain values that may have changed
-        // during the call to "onRequest".
-        if (typeof config === "function") {
-            config = config();
-        }
+                // Make the request.
+                return this.getRequest(config)
+                    .send()
+                    .then((response) => {
+                        onSuccess(response);
+                        resolve(response);
+                    })
+                    .catch((error) => {
+                        onFailure(error);
+                        reject(error);
+                    })
 
-        // Apply the default headers.
-        _defaults(config.headers, this.getDefaultHeaders());
+                    // Failure fallback, for errors that occur in `onFailure`.
+                    .catch(reject);
+            }).catch(reject);
+        });
 
-        // Make the request.
-        try {
-            const response = await this.getRequest(config).send();
-
-            onSuccess(response);
-
-            return response;
-        } catch( error ) {
-            try {
-                onFailure(error);
-            } catch( fatalError ) {
-                throw fatalError
-            }
-
-            throw error;
-        }
     }
 
     /**
@@ -595,5 +605,9 @@ class Base {
         );
     }
 }
+
+Base.REQUEST_CONTINUE = REQUEST_CONTINUE;
+Base.REQUEST_REDUNDANT = REQUEST_REDUNDANT;
+Base.REQUEST_SKIP = REQUEST_SKIP;
 
 export default Base;
