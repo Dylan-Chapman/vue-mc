@@ -19,6 +19,14 @@ function expectRequestToBeSkipped(request, done) {
  */
 describe('Collection', () => {
 
+    beforeEach(function () {
+        moxios.install()
+    })
+
+    afterEach(function () {
+        moxios.uninstall()
+    })
+
     describe('_uid', () => {
         it('should automatically generate unique incrementing ids', () => {
             let base = (new Collection())._uid;
@@ -47,7 +55,7 @@ describe('Collection', () => {
             let m = new Model({}, null, {
                 methods: {
                     patch: 'CONSTRUCTOR',
-                },
+                }
             });
 
             expect(m.getOption('methods.patch')).to.equal('CONSTRUCTOR');
@@ -61,13 +69,13 @@ describe('Collection', () => {
                         methods: {
                             update: 'INSTANCE',
                             patch:  'INSTANCE',
-                        },
+                        }
                     }
                 }
             }({}, null, {
                 methods: {
                     patch: 'CONSTRUCTOR',
-                },
+                }
             });
 
             expect(m.getOption('methods.patch')).to.equal('CONSTRUCTOR');
@@ -226,7 +234,7 @@ describe('Collection', () => {
             let c = new class extends Collection {
                 routes() {
                     return {
-                        'fetch': 'http://domain.com/:page',
+                        'fetch': 'http://domain.com/:page'
                     }
                 }
                 getRouteResolver() {
@@ -457,7 +465,7 @@ describe('Collection', () => {
     })
 
     describe('validate', () => {
-        it('should validate all models', () => {
+        it('should validate all models', (done) => {
             let c  = new Collection();
 
             let M1 = class extends Model {
@@ -480,21 +488,34 @@ describe('Collection', () => {
             let m1 = c.add(new M1({a: 1, b: 2}));
             let m2 = c.add(new M2({c: 3}));
 
-            expect(c.validate()).to.equal(false);
-            expect(m1.errors).to.to.have.property('a');
-            expect(m1.errors).to.to.have.property('b');
+            c.validate().then((errors) => {
+                expect(errors).to.have.lengthOf(2);
 
-            expect(m2.errors).to.to.have.property('c');
+                expect(errors[0]).to.have.property('a');
+                expect(errors[0]).to.have.property('b');
+                expect(errors[1]).to.have.property('c');
+
+                expect(m1.errors).to.have.property('a');
+                expect(m1.errors).to.have.property('b');
+                expect(m2.errors).to.have.property('c');
+
+                done();
+            });
         })
 
         it('should pass with no models', () => {
             let c  = new Collection();
-            expect(c.validate()).to.equal(true);
+            c.validate().then((errors) => {
+                expect(errors).to.be.empty;
+            });
         })
 
-        it('should pass with no models that have validation', () => {
+        it('should pass with no models that have validation', (done) => {
             let c = new Collection([{}, {}]);
-            expect(c.validate()).to.equal(true);
+            c.validate().then((errors) => {
+                expect(errors).to.deep.equal([{}, {}]);
+                done();
+            });
         })
     })
 
@@ -606,7 +627,7 @@ describe('Collection', () => {
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
                         status: 200,
-                        response: [{id: 1}, {id: 2}],
+                        response: [{id: 1},{id: 2}],
                     })
                 })
             })
@@ -1534,7 +1555,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200,
+                        status: 200
                     })
                 })
             })
@@ -1563,7 +1584,7 @@ describe('Collection', () => {
             })
         })
 
-        it('should skip if already deleting', () => {
+        it('should skip if already deleting', (done) => {
             let c = new class extends Collection {
                 routes() { return {delete: '/delete'}}
             }
@@ -1571,17 +1592,14 @@ describe('Collection', () => {
             c.add(new Model({id: 1}));
             c.add(new Model({id: 2}));
 
-            c._state.deleting = true;
+            c.deleting = true;
             expect(c.deleting).to.equal(true);
 
             c.on('delete', () => {
                 throw 'Did not expect to handle event'
             });
 
-            c.delete().then((response) => {
-                expect(response).to.be.null;
-                done();
-            });
+            expectRequestToBeSkipped(c.delete(), done);
         })
 
         it('should skip if there are no models to delete', (done) => {
@@ -1604,14 +1622,11 @@ describe('Collection', () => {
             let m2 = c.add({a: 2});
             let m3 = c.add({a: 3});
 
-            m1._state.deleting = true;
-            m2._state.deleting = true;
-            m3._state.deleting = true;
+            m1.deleting = true;
+            m2.deleting = true;
+            m3.deleting = true;
 
-            c.delete().then((response) => {
-                expect(response).to.be.null;
-                done();
-            })
+            expectRequestToBeSkipped(c.delete(), done);
         })
 
         it('should emit event on success', (done) => {
@@ -1632,7 +1647,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200,
+                        status: 200
                     })
                 })
             })
@@ -1656,7 +1671,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 500,
+                        status: 500
                     })
                 })
             })
@@ -1801,7 +1816,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 500,
+                        status: 500
                     })
                 })
             })
@@ -1824,7 +1839,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200,
+                        status: 200
                     })
                 })
             })
@@ -1846,36 +1861,10 @@ describe('Collection', () => {
                     done();
                 })
 
-                expect(c.deleting).to.equal(true);
-
                 moxios.wait(() => {
+                    expect(c.deleting).to.equal(true);
                     moxios.requests.mostRecent().respondWith({
-                        status: 200,
-                    })
-                })
-            })
-        })
-
-        it('should set deleting to false on delete success', (done) => {
-            let c = new class extends Collection {
-                routes() { return {delete: '/delete'}}
-            }
-
-            c.add(new Model({id: 1}));
-            c.add(new Model({id: 2}));
-
-            moxios.withMock(() => {
-                expect(c.deleting).to.equal(false);
-                c.delete().then((response) => {
-                    expect(c.deleting).to.equal(false);
-                    done();
-                })
-
-                expect(c.deleting).to.equal(true);
-
-                moxios.wait(() => {
-                    moxios.requests.mostRecent().respondWith({
-                        status: 200,
+                        status: 200
                     })
                 })
             })
@@ -1896,11 +1885,10 @@ describe('Collection', () => {
                     done();
                 })
 
-                expect(c.deleting).to.equal(true);
-
                 moxios.wait(() => {
+                    expect(c.deleting).to.equal(true);
                     moxios.requests.mostRecent().respondWith({
-                        status: 500,
+                        status: 500
                     })
                 })
             })
@@ -1938,7 +1926,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200,
+                        status: 200
                     });
                 })
             })
@@ -1954,10 +1942,7 @@ describe('Collection', () => {
             c.add({a: 1});
             c.add({a: 2});
 
-            c._state.saving = true;
-
-            expect(c.saving).to.equal(true);
-
+            c.saving = true;
             c.save().then((response) => {
                 expect(response).to.be.null;
                 done();
@@ -2019,8 +2004,11 @@ describe('Collection', () => {
 
             moxios.withMock(() => {
                 c.save();
-                expect(c.saving).to.equal(true);
-                done();
+
+                moxios.wait(() => {
+                    expect(c.saving).to.equal(true);
+                    done();
+                });
             })
         })
 
@@ -2217,7 +2205,7 @@ describe('Collection', () => {
                     moxios.requests.mostRecent().respondWith({
                         status: 200,
                         response: [
-                            1, 2,
+                            1, 2
                         ],
                     });
                 })
@@ -2242,7 +2230,7 @@ describe('Collection', () => {
                     moxios.requests.mostRecent().respondWith({
                         status: 200,
                         response: [
-                            4, 5,
+                            4, 5
                         ],
                     });
                 })
@@ -2269,7 +2257,7 @@ describe('Collection', () => {
                     moxios.requests.mostRecent().respondWith({
                         status: 200,
                         response: [
-                            1, 2,
+                            1, 2
                         ],
                     });
                 })
@@ -2292,7 +2280,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200,
+                        status: 200
                     });
                 })
             })
@@ -2307,7 +2295,7 @@ describe('Collection', () => {
             let m2 = c.add({a: 2});
 
             moxios.withMock(() => {
-                c._state.fatal = true;
+                c.fatal = true;
 
                 c.save().then((response) => {
                     expect(c.fatal).to.equal(false);
@@ -2316,7 +2304,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200,
+                        status: 200
                     });
                 })
             })
@@ -2345,7 +2333,7 @@ describe('Collection', () => {
                         status: 200,
                         response: [
                             {id: 1, a: 10},
-                            {id: 2, a: 20},
+                            {id: 2, a: 20}
                         ],
                     });
                 })
@@ -2367,7 +2355,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200,
+                        status: 200
                     });
                 })
             })
@@ -2389,7 +2377,7 @@ describe('Collection', () => {
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
                         status: 422,
-                        response: '5',
+                        response: '5'
                     });
                 })
             })
@@ -2414,7 +2402,7 @@ describe('Collection', () => {
                         status: 422,
                         response: [
                             {a: ['Bad!']},
-                        ],
+                        ]
                     });
                 })
             })
@@ -2442,7 +2430,7 @@ describe('Collection', () => {
                         response: [
                             {a: ['Error!']},
                             {a: ['Invalid!']},
-                        ],
+                        ]
                     });
                 })
             })
@@ -2472,7 +2460,7 @@ describe('Collection', () => {
                         response: {
                             [m1.identifier()]: {a: ['Error!']},
                             [m3.identifier()]: {a: ['Bad!']},
-                        },
+                        }
                     });
                 })
             })
@@ -2487,8 +2475,8 @@ describe('Collection', () => {
             let m2 = c.add({a: 2});
 
             moxios.withMock(() => {
-                m1._state.fatal = true;
-                m2._state.fatal = true;
+                m1.fatal = true;
+                m2.fatal = true;
 
                 c.save().catch((error) => {
                     expect(m1.fatal).to.equal(false);
@@ -2502,7 +2490,7 @@ describe('Collection', () => {
                         response: [
                             {a: ['A!']},
                             {a: ['B!']},
-                        ],
+                        ]
                     });
                 })
             })
@@ -2517,7 +2505,7 @@ describe('Collection', () => {
             let m2 = c.add({a: 2});
 
             moxios.withMock(() => {
-                c._state.fatal = true;
+                c.fatal = true;
 
                 c.save().catch((error) => {
                     expect(c.fatal).to.equal(false);
@@ -2530,7 +2518,7 @@ describe('Collection', () => {
                         response: [
                             {a: ['A!']},
                             {a: ['B!']},
-                        ],
+                        ]
                     });
                 })
             })
@@ -2655,7 +2643,7 @@ describe('Collection', () => {
                         response: [
                             {a: 'A!'},
                             {a: 'B!'},
-                        ],
+                        ]
                     });
                 })
             })
@@ -2904,12 +2892,12 @@ describe('Collection', () => {
             })
         })
 
-        it('should not skip if already fetching', () => {
+        it('should not skip if already fetching', (done) => {
             let c = new class extends Collection {
                 routes() { return {fetch: '/fetch'}}
             }
 
-            c._state.loading = true;
+            c.loading = true;
 
             moxios.withMock(() => {
                 c.fetch().then((response) => {
@@ -2942,7 +2930,7 @@ describe('Collection', () => {
             moxios.wait(() => {
                 moxios.requests.mostRecent().respondWith({
                     status: 200,
-                    response: [],
+                    response: []
                 });
             });
         })
@@ -2953,7 +2941,7 @@ describe('Collection', () => {
             }
 
             moxios.withMock(() => {
-                c._state.loading = false;
+                c.loading = false;
                 expect(c.loading).to.equal(false);
                 c.fetch();
                 expect(c.loading).to.equal(true);
@@ -2980,7 +2968,7 @@ describe('Collection', () => {
                         status: 200,
                         response: [
                             {id: 100},
-                        ],
+                        ]
                     });
                 });
             })
@@ -3002,7 +2990,7 @@ describe('Collection', () => {
                         status: 200,
                         response: [
                             {id: 1},
-                        ],
+                        ]
                     });
                 });
             })
@@ -3014,7 +3002,7 @@ describe('Collection', () => {
             }
 
             moxios.withMock(() => {
-                c._state.fatal = true;
+                c.fatal = true;
 
                 c.fetch().then((response) => {
                     expect(c.fatal).to.equal(false);
@@ -3026,7 +3014,7 @@ describe('Collection', () => {
                         status: 200,
                         response: [
                             {id: 1},
-                        ],
+                        ]
                     });
                 });
             })
@@ -3040,7 +3028,7 @@ describe('Collection', () => {
             c.page(1);
 
             moxios.withMock(() => {
-                c.fetch().then((response) => {
+                 c.fetch().then((response) => {
                     expect(c.loading).to.equal(false);
                     done();
                 });
@@ -3050,7 +3038,7 @@ describe('Collection', () => {
                         status: 200,
                         response: [
                             {id: 1},
-                        ],
+                        ]
                     });
                 });
             })
@@ -3064,7 +3052,7 @@ describe('Collection', () => {
             c.page(1);
 
             moxios.withMock(() => {
-                c._state.fatal = true;
+                c.fatal = true;
 
                 c.fetch().then((response) => {
                     expect(c.fatal).to.equal(false);
@@ -3076,7 +3064,7 @@ describe('Collection', () => {
                         status: 200,
                         response: [
                             {id: 1},
-                        ],
+                        ]
                     });
                 });
             })
@@ -3098,7 +3086,7 @@ describe('Collection', () => {
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
                         status: 200,
-                        response: [],
+                        response: []
                     });
                 });
             })
@@ -3123,7 +3111,7 @@ describe('Collection', () => {
                         status: 200,
                         response: [
                             {a: 1},
-                        ],
+                        ]
                     });
                 });
             })
@@ -3142,7 +3130,7 @@ describe('Collection', () => {
 
                 moxios.wait(() => {
                     moxios.requests.mostRecent().respondWith({
-                        status: 200,
+                        status: 200
                     });
                 });
             })
@@ -3223,4 +3211,3 @@ describe('Collection', () => {
         })
     })
 })
-
