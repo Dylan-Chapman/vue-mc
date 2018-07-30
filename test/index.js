@@ -8,18 +8,18 @@ process.on('unhandledRejection', (error, promise) => {
 });
 
 // Structures
-require('./Structures/Model.spec.js');
-require('./Structures/Collection.spec.js');
+import './Structures/Model.spec.js';
+import './Structures/Collection.spec.js';
 
 // Validation
-require('./Validation/Rule.spec.js');
-require('./Validation/Rules.spec.js');
-require('./Validation/Messages.spec.js');
+import './Validation/Rule.spec.js';
+import './Validation/Rules.spec.js';
+import './Validation/Messages.spec.js';
 
 // HTTP
-require('./HTTP/ProxyResponse.spec.js');
+import './HTTP/ProxyResponse.spec.js';
 
 // Errors
-require('./Errors/RequestError.spec.js');
-require('./Errors/ResponseError.spec.js');
-require('./Errors/ValidationError.spec.js');
+import './Errors/RequestError.spec.js';
+import './Errors/ResponseError.spec.js';
+import './Errors/ValidationError.spec.js';
