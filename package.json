@@ -35,7 +35,7 @@
     },
     "dependencies": {
         "axios": "^0.18",
-        "date-fns": "^2.0.0-alpha.11",
+        "date-fns": "^2.0.0-alpha.14",
         "lodash": "^4.17",
         "validator": "^10.4.0"
     },
