@@ -179,15 +179,15 @@ export const rule = function(config) {
      * This is the function that is called when using this rule.
      * It has some extra metadata to allow rule chaining and custom formats.
      */
-    let $rule = async function(value, attribute, model) {
+    let $rule = function(value, attribute, model) {
 
         // `true` if this rule's core acceptance criteria was met.
-        let valid = await test(value, attribute, model);
+        let valid = test(value, attribute, model);
 
         // If valid, check that all rules in the "and" chain also pass.
         if (valid) {
             for (let _and of $rule._and) {
-                let result = await _and(value, attribute, model);
+                let result = _and(value, attribute, model);
 
                 // If any of the chained rules return a string, we know that
                 // that rule has failed, and therefore this chain is invalid.
@@ -213,7 +213,7 @@ export const rule = function(config) {
         // that a rule in the "or" chain's might pass.
         } else {
             for (let _or of $rule._or) {
-                let result = await _or(value, attribute, model);
+                let result = _or(value, attribute, model);
 
                 // A rule should either return true in the event of a general
                 // "pass", or nothing at all. A failure would have to be a
