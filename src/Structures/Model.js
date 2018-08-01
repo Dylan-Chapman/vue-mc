@@ -10,27 +10,20 @@ import {
     filter as _filter,
     flow as _flow,
     get as _get,
-    has as _has,
     head as _head,
-    invert as _invert,
     isEmpty as _isEmpty,
     isEqual as _isEqual,
     isObject as _isObject,
     isObjectLike as _isObjectLike,
     isPlainObject as _isPlainObject,
-    keys as _keys,
-    mapValues as _mapValues,
     merge as _merge,
-    once as _once,
     pick as _pick,
-    reduce as _reduce,
-    values as _values,
 } from 'lodash'
 
 /**
  * Reserved keywords that can't be used for attribute or option names.
  */
-const RESERVED = _invert([
+const RESERVED = [
     '_attributes',
     '_collections',
     '_errors',
@@ -47,7 +40,7 @@ const RESERVED = _invert([
     'memoized',
     'models',
     'saving',
-]);
+];
 
 /**
  * Recursive deep copy helper that honours the "clone" function of models and
@@ -66,14 +59,11 @@ const copyFrom = function(source, target, keys) {
         if (Array.isArray(value)) {
             Vue.set(target, key, []);
             copyFrom(value, target[key]);
-
         } else if (_isPlainObject(value)) {
             Vue.set(target, key, {});
             copyFrom(value, target[key]);
-
         } else if (_isObject(value) && typeof value.clone === 'function') {
             Vue.set(target, key, value.clone());
-
         } else {
             Vue.set(target, key, _cloneDeep(value));
         }
@@ -108,7 +98,7 @@ class Model extends Base {
      * @returns {Object} The collection that this model is registered to.
      */
     get collections() {
-        return _values(this._collections);
+        return Object.keys(this._collections).map((key) => this._collections[key]);
     }
 
     /**
@@ -188,12 +178,16 @@ class Model extends Base {
      */
     memoize() {
         let memoized = [
-            'validation',  //   \
-            'defaults',    //   | These do not need to be evaluated every time.
-            'routes',      //  /
+            'validation',
+            'defaults',
+            'routes',
         ];
 
-        _each(memoized, (name) => this[name] = _once(this[name]));
+        memoized.forEach((method) => {
+            const val = this[method]();
+
+            this[method] = () => val;
+        });
     }
 
     /**
@@ -284,7 +278,14 @@ class Model extends Base {
      * Compiles all mutations into pipelines that can be executed quickly.
      */
     compileMutators() {
-        this._mutations = _mapValues(this.mutations(), (m) => _flow(m));
+        const mutations = this.mutations();
+        const chainedMutations = {};
+
+        Object.keys(mutations).forEach((key) => {
+            chainedMutations[key] = _flow(mutations[key]);
+        });
+
+        this._mutations = chainedMutations;
     }
 
     /**
@@ -474,7 +475,7 @@ class Model extends Base {
 
         // Protect against unwillingly using an attribute name that already
         // exists as an internal property or method name.
-        if (_has(RESERVED, attribute)) {
+        if (RESERVED.indexOf( attribute ) !== -1) {
             throw new Error(`Can't use reserved attribute name '${attribute}'`);
         }
 
@@ -555,7 +556,7 @@ class Model extends Base {
         let defaults = _cloneDeep(this.defaults());
 
         // Unset either specific attributes or all attributes if none provided.
-        let attributes = _defaultTo(attribute, _keys(this._attributes));
+        let attributes = _defaultTo(attribute, Object.keys(this._attributes));
 
         // Unset either specific attributes or all attributes if none provided.
         _each([].concat(attributes || []), (attribute) => {
@@ -603,7 +604,7 @@ class Model extends Base {
      *                   Will return true if the object exists but is undefined.
      */
     has(attribute) {
-        return _has(this._attributes, attribute);
+        return this._attributes.hasOwnProperty(attribute);
     }
 
     /**
@@ -638,14 +639,14 @@ class Model extends Base {
         return Promise.all(tasks).then((errors) => {
 
             // Errors will always be messages or nested error objects.
-            errors = _filter(errors, (e) => typeof e === 'string' || _isObject(e));
+            errors = errors.filter((error) => typeof error === 'string' || _isObject(error));
 
             // Set errors for the model being validated.
             this.setAttributeErrors(attribute, errors);
-            
+
             // Check to see if we should yield only the first error.
-            if (this.getOption('useFirstErrorOnly') && ! _isEmpty(errors)) {
-                return _head(errors);
+            if (this.getOption('useFirstErrorOnly') && errors.length) {
+                return errors[0];
             }
 
             return errors;
@@ -841,13 +842,6 @@ class Model extends Base {
     }
 
     /**
-     * @returns {*} A potential identifier parsed from response data.
-     */
-    parseIdentifier(data) {
-        return data;
-    }
-
-    /**
      * @returns {boolean} Whether the given identifier is considered a valid
      *                   identifier value for this model.
      */
@@ -885,7 +879,7 @@ class Model extends Base {
         // There is some data, but it's not an object, so we can assume that the
         // response only returned an identifier for this model.
         } else {
-            let identifier = this.parseIdentifier(data);
+            let identifier = data;
 
             // It's possible that the response didn't actually return a valid
             // identifier, so before we try to use it we should make sure that
@@ -951,7 +945,13 @@ class Model extends Base {
      */
     getErrors() {
         if (this.getOption('useFirstErrorOnly')) {
-            return _mapValues(this._errors, _head);
+            const errors = {};
+
+            Object.keys(this._errors).forEach((key) => {
+                errors[key] = this._errors[key][0]
+            });
+
+            return errors;
         }
 
         return this._errors;
@@ -1131,7 +1131,6 @@ class Model extends Base {
                 }
 
                 Vue.set(this, 'saving', false);
-                console.log( "rejecting" );
                 reject(new ValidationError(this.errors));
                 return;
             });

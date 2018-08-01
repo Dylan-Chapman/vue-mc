@@ -11,13 +11,11 @@ import {
     filter as _filter,
     find as _find,
     findIndex as _findIndex,
-    first as _first,
     get as _get,
     has as _has,
     isObject as _isObject,
     isPlainObject as _isPlainObject,
     keyBy as _keyBy,
-    last as _last,
     map as _map,
     max as _max,
     merge as _merge,
@@ -110,7 +108,7 @@ class Collection extends Base {
      * @return {*} The value of an attribute, or a given fallback if not set.
      */
     get(attribute, fallback) {
-        return _get(this._attributes, attribute, fallback);
+        return this._attributes.hasOwnProperty(attribute) ? this._attributes[attribute] : fallback;
     }
 
     /**
@@ -365,7 +363,7 @@ class Collection extends Base {
             return;
         }
 
-        let model = _get(this.models, index);
+        let model = this.models[index];
         Vue.delete(this.models, index);
         this.onRemove(model);
 
@@ -610,14 +608,14 @@ class Collection extends Base {
      * @returns {Model|undefined} The first model of this collection.
      */
     first() {
-        return _first(this.models);
+        return this.models[0];
     }
 
     /**
      * @returns {Model|undefined} The last model of this collection.
      */
     last() {
-        return _last(this.models);
+        return this.models[this.models.length - 1];
     }
 
     /**
@@ -694,7 +692,7 @@ class Collection extends Base {
         // We're making an assumption here that paginated models are returned
         // within the "data" field of the response.
         if (this.isPaginated()) {
-            return _get(models, 'data', models);
+            return models.hasOwnProperty('data') ? models.data : models;
         }
 
         return models;
