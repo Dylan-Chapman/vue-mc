@@ -84,13 +84,10 @@ class Collection extends Base {
      * @returns {Collection}
      */
     clone() {
-        let clone = new (this.constructor)();
+        let clone = new (this.constructor)(this.getModels(), this.getOptions(), this.getAttributes());
 
-        // Add all the existing models.
-        clone.add(this.models);
-
-        // Make sure that the clone has the same existing options.
-        clone.setOptions(this.getOptions());
+        // Apple the state from the current collection to the new collection
+        Vue.set(clone, '_state', this._state);
 
         return clone;
     }
@@ -132,6 +129,20 @@ class Collection extends Base {
         }
 
         Vue.set(this._attributes, attribute, value);
+    }
+
+    /**
+     * @return {Object}
+     */
+    getAttributes() {
+        return this._attributes;
+    }
+
+    /**
+     * @return {Model[]}
+     */
+    getModels() {
+        return this.models;
     }
 
     /**
@@ -464,18 +475,6 @@ class Collection extends Base {
     }
 
     /**
-     * Wraps a new collection instance around some given models.
-     */
-    wrap(models) {
-        const newCollection = new (this.constructor)(models);
-
-        // Apple the state from the current collection to the new collection
-        Vue.set(newCollection, '_state', this._state);
-
-        return newCollection;
-    }
-
-    /**
      * Creates a new collection of the same type that contains only the models
      * for which the given predicate returns `true` for, or matches by property.
      *
@@ -489,7 +488,11 @@ class Collection extends Base {
      * @returns {Collection}
      */
     filter(predicate) {
-        return this.wrap(this.where(predicate));
+        const clone = this.clone();
+
+        clone.models = _filter(clone.models, predicate);
+
+        return clone;
     }
 
     /**
