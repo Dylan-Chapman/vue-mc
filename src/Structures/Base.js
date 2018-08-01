@@ -2,18 +2,11 @@ import Request from '../HTTP/Request.js'
 import Vue from 'vue'
 import { autobind } from '../utils.js'
 import {
-    defaultTo as _defaultTo,
     defaults as _defaults,
     defaultsDeep as _defaultsDeep,
-    each as _each,
     get as _get,
-    invoke as _invoke,
-    map as _map,
     reduce as _reduce,
     replace as _replace,
-    set as _set,
-    split as _split,
-    trim as _trim,
     uniqueId as _uniqueId,
 } from 'lodash'
 
@@ -117,9 +110,9 @@ class Base {
      * @param {Object} context  The context of the event, passed to listeners.
      */
     emit(event, context = {}) {
-        let listeners = _get(this._listeners, event);
+        const listeners = this._listeners[event];
 
-        if ( ! listeners) {
+        if (! listeners) {
             return;
         }
 
@@ -128,7 +121,7 @@ class Base {
 
         // Run through each listener. If any of them return false, stop the
         // iteration and mark that the event wasn't handled by all listeners.
-        _each(listeners, (listener) => listener(context));
+        listeners.some((listener) => listener(context) === false);
     }
 
     /**
@@ -140,9 +133,9 @@ class Base {
      * @param {function} listener   The event listener, accepts context.
      */
     on(event, listener) {
-        let events = _map(_split(event, ','), _trim);
+        const events = event.split(',').map((e) => e.trim());
 
-        _each(events, (event) => {
+        events.forEach((event) => {
             this._listeners[event] = this._listeners[event] || [];
             this._listeners[event].push(listener);
         });
@@ -210,7 +203,7 @@ class Base {
      * @param {*}      value
      */
     setOption(path, value) {
-        _set(this._options, path, value);
+        Vue.set(this._options, path, value);
     }
 
     /**
@@ -234,7 +227,7 @@ class Base {
      * @return {Object}
      */
     getOptions() {
-        return _defaultTo(this._options, {});
+        return this._options || {};
     }
 
     /**
@@ -413,7 +406,7 @@ class Base {
      * @returns {number} The HTTP status code that indicates a validation error.
      */
     getValidationErrorStatus() {
-        return _defaultTo(this.getOption('validationErrorStatus'), 422);
+        return this.getOption('validationErrorStatus') || 422;
     }
 
     isValidationError(error) {
@@ -426,7 +419,7 @@ class Base {
     isBackendValidationError(error) {
 
         // The error must have a response for it to be a validation error.
-        if ( ! _invoke(error, 'getResponse', false)) {
+        if (typeof error.getResponse !== 'function') {
             return false;
         }
 
