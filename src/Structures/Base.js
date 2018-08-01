@@ -1,5 +1,4 @@
 import Request from '../HTTP/Request.js'
-import ValidationError from '../Errors/ValidationError.js';
 import Vue from 'vue'
 import { autobind } from '../utils.js'
 import {
@@ -418,7 +417,7 @@ class Base {
     }
 
     isValidationError(error) {
-        return error && error instanceof ValidationError;
+        return error && error.name === 'ValidationError';
     }
 
     /**
